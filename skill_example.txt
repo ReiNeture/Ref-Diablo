@@ -1,0 +1,58 @@
+#include <amxmodx>
+#include <d2lod>
+
+new PLUGIN_NAME[] = "範例技能"
+new PLUGIN_AUTHOR[] = "xbatista"
+new PLUGIN_VERSION[] = "1.0"
+
+new Skill_Level = 1;
+
+new g_SkillId;
+
+new g_iCurSkill[33];
+
+public plugin_init() 
+{
+	register_plugin(PLUGIN_NAME, PLUGIN_VERSION, PLUGIN_AUTHOR)
+
+	// 我們註冊一個技能.
+	// 職業的類別和顯示類別,如果你不知道,可以看/include/d2lod.inc.
+	g_SkillId = register_d2_skill(PLUGIN_NAME, "範例", AMAZON, Skill_Level, DISPLAY)
+
+}
+
+public d2_skill_selected(id, skill_id)
+{
+	// 在這裡玩家按E選擇了技能.
+
+	g_iCurSkill[id] = skill_id;
+}
+
+public d2_skill_fired(id)
+{
+	// 在這裡玩家使用技能了.
+
+	if ( g_iCurSkill[id] == g_SkillId )
+	{
+		// 使用技能後做了什麼事情.
+	}
+}
+
+public d2_takedamage(victim, attacker, Float:iDamage[1])
+{
+	// 玩家攻擊時改變他的傷害值,例如這樣 : iDamage[0] += 5.0.
+}
+
+public d2_logged(id, log_type)
+{
+	// 玩家登入時, LOGGED - 1, 玩家未登入時, UNLOGGED - 0.
+
+	if ( log_type == LOGGED )
+	{
+		// 玩家登入時,做什麼事情.
+	}
+	else
+	{
+		// 玩家未登入時(也就是回到角色選擇選單),做什麼事情.
+	}
+}
