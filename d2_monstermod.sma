@@ -31,16 +31,16 @@ new const Monster_Models[MAX_MONSTERS][] =
 }
 new const Monster_Xp[MAX_MONSTERS] =
 {
-	150,
-	600,
-	100,
-	120,
+	1500,
+	6000,
+	1000,
+	1200,
 	0,
-	50,
+	500,
 	0,
-	120,
+	1200,
 	0,
-	80,
+	800,
 	0,
 	0,
 	0,
@@ -86,11 +86,9 @@ new g_iMaxPlayers;
 public plugin_init() 
 {
 	register_plugin(PLUGIN_NAME, PLUGIN_VERSION, PLUGIN_AUTHOR)
-
 	RegisterHam(Ham_Killed, "func_wall", "Monster_Killed");
-
+	RegisterHam(Ham_Player_PreThink, "player", "fw_Monster_PreThink")
 	register_touch( COINS_CLASSNAME, "player", "Coins_Pickup")
-
 	register_logevent("Event_Round_End", 2, "1=Round_End");
 
 	g_iMaxPlayers = get_maxplayers();
@@ -116,16 +114,41 @@ public Monster_Killed(this, idattacker, shouldgib)
 		{
 			if ( Monster_Xp[monsters] > 0 )
 			{
-				set_p_xp( idattacker, get_p_xp(idattacker) + Monster_Xp[monsters]);
-				client_print( idattacker, print_center, "你殺了 %s, +%d經驗", Monster_Names[monsters], Monster_Xp[monsters]);
+				set_p_xp(idattacker, get_p_xp(idattacker) + Monster_Xp[monsters]);
+				set_p_gold(idattacker, get_p_gold(idattacker) + Monster_Coins[monsters] + (get_p_level(idattacker)/4) );
+				client_print( idattacker, print_center, "你殺了 %s, +%d經驗, +%d$", Monster_Names[monsters], Monster_Xp[monsters], Monster_Coins[monsters] + (get_p_level(idattacker)/4) );
 			}
 
-			if ( Monster_Coins[monsters] > 0 )
-				drop_coins( this, COINS_CLASSNAME, Monster_Coins[monsters] + (get_p_level(idattacker) / 4) );
+			// if ( Monster_Coins[monsters] > 0 )
+			// 	drop_coins( this, COINS_CLASSNAME, Monster_Coins[monsters] + (get_p_level(idattacker) / 4) );
 		}
 	}
 
 	return HAM_IGNORED;
+}
+
+public fw_Monster_PreThink(this, idattacker)
+{
+	if(!is_valid_ent(this))
+		return HAM_IGNORED
+
+	new iTarget, iTemp, szMonsterModel[33], szClassname[33]
+	get_user_aiming(this, iTarget, iTemp)
+	entity_get_string(iTarget, EV_SZ_model, szMonsterModel, sizeof(szMonsterModel))
+	entity_get_string(iTarget, EV_SZ_classname, szClassname, sizeof(szClassname))
+	for(new i = 0;i < MAX_MONSTERS;i++)
+	{
+		if(equal(szClassname, "func_wall"))
+		{
+			if(equal(szMonsterModel, Monster_Models[i]))
+			{
+				set_hudmessage(0, 191, 255, 0.10, 0.55, 0, 0.2, 0.4, 0.1, 0.1, 3)
+				show_hudmessage(this, "怪物: %s^n血量: %d^n經驗: %d", Monster_Names[i], floatround(entity_get_float(iTarget, EV_FL_health)), Monster_Xp[i] )
+				break;
+			}
+		}
+	}
+	return HAM_HANDLED
 }
 
 // Touch, coins

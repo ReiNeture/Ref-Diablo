@@ -7,10 +7,11 @@ public main_hero_menu_connect(id)
 	formatex(szMsg, 59, "主選單 : ")
 	
 	new menu = menu_create(szMsg , "hero_menu_connect");
-
-	menu_additem(menu, "創造新角色", "0", 0);
-	menu_additem(menu, "選擇角色", "1", 0);
-	menu_additem(menu, "刪除角色", "2", 0);
+	if ( g_PlayerChars[id] < 1 )
+		menu_additem(menu, "創造初始角色", "0", 0);
+	if ( g_PlayerChars[id] > 0 )
+		menu_additem(menu, "選擇角色", "1", 0);
+	// menu_additem(menu, "刪除角色", "2", 0);
 	
 	menu_setprop(menu , MPROP_EXIT , MEXIT_ALL);
 	menu_display(id , menu , 0); 
@@ -65,15 +66,13 @@ public hero_menu_connect(id , menu , item)
 public main_hero_menu(id)
 {
 	new szMsg[60], szTempid[32], szItems[512];
-	formatex(szMsg, 59, "創造角色 : ")
+	formatex(szMsg, 59, "創造初始角色 : ")
 	
 	new menu = menu_create(szMsg , "hero_menu");
-	for (new hero_id = 0; hero_id < MAX_HEROES; hero_id++)
+	for (new hero_id = 0; hero_id < 1; hero_id++)
 	{
 		formatex(szItems, charsmax(szItems), "%s", HEROES[hero_id])
-
 		num_to_str(hero_id, szTempid, 31);
-
 		menu_additem(menu, szItems, szTempid, 0);
 	}
 	
@@ -240,7 +239,7 @@ public main_mod_menu(id)
 	if ( !g_iLogged[id] )
 		return PLUGIN_HANDLED;
 
-	new menu = menu_create("Diablo II LOD 選單 [繁化By Lie]" , "mod_menu");
+	new menu = menu_create("Diablo II LOD 選單" , "mod_menu");
 	menu_additem(menu ,"\w能力選單", "1" , 0); 
 	menu_additem(menu ,"\w技能選單", "2" , 0); 
 	menu_additem(menu ,"\w個人狀態", "3" , 0);

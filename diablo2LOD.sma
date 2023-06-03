@@ -28,6 +28,7 @@
 #include "diablo2LOD/effects.inl"
 #include "diablo2LOD/stocks.inl"
 #include "diablo2LOD/mysql.inl"
+#include "diablo2LOD/calc.inl"
 
 public plugin_init()
 {
@@ -164,6 +165,7 @@ public plugin_natives()
 	register_native("set_p_maxhealth", "native_set_p_maxhealth", 1);
 	register_native("IsPlayerNearByMonster", "native_get_p_near_monster", 1);
 	register_native("drop_coins", "Native_Create_Coins");
+	register_native("get_p_magic", "native_get_p_magic", 1);
 }
 
 public client_connect(id)
@@ -201,7 +203,7 @@ public client_disconnect(id)
 	if( !is_valid_ent(iEnt) )
 	{
 		g_iCam[id] = 0
-		remove_entity(iEnt)
+		// remove_entity(iEnt)
 	}
 
 	// 回覆一些值.
@@ -378,6 +380,10 @@ public native_get_p_gold_inventory(id)
 public native_get_p_gold(id)
 {
 	return g_Coins[id][g_CurrentChar[id]];
+}
+public native_get_p_magic(id)
+{
+	return g_Energy[id][g_CurrentChar[id]];
 }
 public native_MAX_SKILLS_ACTIVE()
 {

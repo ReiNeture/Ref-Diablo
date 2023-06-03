@@ -154,7 +154,7 @@ public fwd_PlayerDamagedMonster(victim, inflictor, attacker, Float:damage, damag
 			
 	if ( get_pcvar_num(d2_show_damage) )
 	{
-		set_hudmessage(255, 255, 255, 0.49, 0.35, 1, 1.5, 1.5, 0.0, 0.0, 3)
+		set_hudmessage(255, 255, 255, 0.49, 0.3, 1, 1.5, 1.5, 0.0, 0.0, 3)
 		ShowSyncHudMsg(attacker, g_SyncHudCreate_Dmg , "+%d", floatround(iArray[0]));
 	}
 

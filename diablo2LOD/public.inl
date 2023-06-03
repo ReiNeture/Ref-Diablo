@@ -204,7 +204,6 @@ public Adv_Message()
 	{
 		if ( !is_user_connected(id) )
 			continue;
-		client_printcolor(id, "/gζ|_/ctr繁化By Lie/g_|ζ");
 		client_printcolor(id, "/y主要指令: /ctr/d2menu/y, /ctr/worn/y, /ctr/level/y, /ctr/trade/y, /ctr/potion/y, /ctr/spec/y.");
 		client_printcolor(id, "/y倉庫用指令: /ctr/deposit 5/y, /ctr/withdraw 5/y.");
 		client_printcolor(id, "/y控制台指令: /ctrbind t +skills/y, /ctrbind q potion/y.");
@@ -218,7 +217,7 @@ public Mana_Regenerate(id)
 	if ( !is_user_alive(id) )
 		return;
 
-	Set_Player_Mana(id, g_CurrentMana[id] + 1);
+	Set_Player_Mana(id, g_CurrentMana[id] + 20);
 }
 
 public HUD_Say_Info_Task(id)

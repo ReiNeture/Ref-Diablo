@@ -2,6 +2,7 @@
 #include <d2lod>
 #include <fakemeta>
 #include <engine>
+#include <hamsandwich>
 
 new PLUGIN_NAME[] = "爆炸火球"
 new PLUGIN_AUTHOR[] = "xbatista"
@@ -20,7 +21,7 @@ new const SorcaManaFireBall[MAX_P_SKILLS] =  // 發射火球需要的能量.
 };
 new const Float:FireBallDamage[MAX_P_SKILLS] =  // 術士的火球傷害.
 {
-	10.0, 20.0, 25.0, 30.0, 35.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 	110.0, 120.0, 125.0, 130.0, 140.0, 150.0, 155.0, 160.0
+	10.0, 20.0, 25.0, 30.0, 35.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 110.0, 120.0, 125.0, 130.0, 140.0, 150.0, 155.0, 160.0
 };
 
 new g_SkillId;
@@ -29,16 +30,16 @@ new g_iCurSkill[33];
 new Float:g_LastPressedSkill[33];
 new g_spriteBall;
 new g_iMaxPlayers;
+new g_SyncHudCreate_Dmg;
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN_NAME, PLUGIN_VERSION, PLUGIN_AUTHOR)
-
-	g_SkillId = register_d2_skill(PLUGIN_NAME, "發射一顆會爆炸的火球.", SORCERESS, Skill_Level, DISPLAY)
-
+	g_SkillId = register_d2_skill(PLUGIN_NAME, "發射一顆會爆炸的火球.", AMAZON, Skill_Level, DISPLAY)
 	register_forward(FM_Touch, "Entity_Touched");
 
 	g_iMaxPlayers = get_maxplayers();
+	g_SyncHudCreate_Dmg = CreateHudSyncObj();
 }
 
 public plugin_precache()
@@ -59,7 +60,7 @@ public d2_skill_fired(id)
 	if ( g_iCurSkill[id] == g_SkillId )
 	{
 		static Float:cdown;
-		cdown = 1.0;
+		cdown = 0.0;
 
 		if (get_gametime() - g_LastPressedSkill[id] <= cdown) 
 		{
@@ -76,9 +77,9 @@ public d2_skill_fired(id)
 
 			set_p_mana( id, get_p_mana(id) - SorcaManaFireBall[ get_p_skill( id, g_SkillId ) - 1 ]);
 
-			Set_Sprite_FireBolt(id, FireCast, 50.0, 0.7, "FireBall");
+			Set_Sprite_FireBolt(id, FireCast, 50.0, 0.3, "FireBall");
 
-			Set_Sprite_Task(id, OnPFireSpr, 2.7, 1, 0.8, "Morph");
+			// Set_Sprite_Task(id, OnPFireSpr, 2.7, 1, 0.8, "Morph");
 		}
 	}
 	
@@ -97,7 +98,7 @@ public Entity_Touched(ent, victim)
 	
 	if(equal(classname,"FireBall")) 
 	{
-		new Float: Torigin[3], Float: Distance, Float: Damage;
+		new Float:Torigin[3], Float:Distance, Float:Damage, npcname[32];
 
 		new Float:fOrigin[3], iOrigin[3];
 		entity_get_vector( ent, EV_VEC_origin, fOrigin)	
@@ -116,18 +117,43 @@ public Entity_Touched(ent, victim)
 		write_byte(0); // 標記.
 		message_end();
 
+		Damage = FireBallDamage[get_p_skill(attacker, g_SkillId) - 1] + float(get_p_magic(attacker)) * 0.5;
+		new monsterCount = 0;
+		new victim = FM_NULLENT;
+
+		while( (victim = engfunc(EngFunc_FindEntityInSphere, victim, fOrigin, 250.0) ) != 0 ) {
+			pev(victim, pev_classname, npcname, sizeof(npcname));
+
+			if( monsterCount >= 5 ) break;
+			if( attacker == victim ) continue;
+
+			if( is_user_alive(victim) && !IsPlayerNearByMonster(victim) && !is_p_protected(victim) && get_p_skill(attacker, g_SkillId) > 0 )
+			{
+				dmg_kill_player(victim, attacker, Damage, "fireball");
+				monsterCount++;
+			}
+			else if( !is_user_alive(victim) && equal(npcname, "func_wall") )
+			{
+				ExecuteHam(Ham_TakeDamage, victim, ent, attacker, Damage, DMG_BURN);
+				monsterCount++;
+			}
+		}
+
+		if( monsterCount > 0 ) {
+			// set_hudmessage(255, 180, 180, 0.49, 0.3, 1, 1.5, 1.5, 0.0, 0.0, 3)
+			// ShowSyncHudMsg(attacker, g_SyncHudCreate_Dmg , "%s+%d", PLUGIN_NAME, floatround(Damage));
+		}
+
+		/*
 		for(new enemy = 1; enemy <= g_iMaxPlayers; enemy++) 
 		{
 			if ( is_user_alive(enemy) )
 			{
 				entity_get_vector( enemy, EV_VEC_origin, Torigin)
-
 				Distance = get_distance_f(fOrigin, Torigin);
-
-				if ( Distance <= 175.0 && !IsPlayerNearByMonster(enemy) && !is_p_protected(enemy) && get_p_skill( attacker, g_SkillId ) > 0 )
+				if ( Distance <= 250.0 && !IsPlayerNearByMonster(enemy) && !is_p_protected(enemy) && get_p_skill( attacker, g_SkillId ) > 0 )
 				{
-					Damage = (((Distance / 175.0) * FireBallDamage[get_p_skill( attacker, g_SkillId ) - 1]) - FireBallDamage[get_p_skill( attacker, g_SkillId ) - 1]) * -1.0;
-
+					Damage = (  ((Distance / 250.0) * FireBallDamage[get_p_skill( attacker, g_SkillId ) - 1]) - FireBallDamage[get_p_skill( attacker, g_SkillId ) - 1]) * -1.0;
 					if (Damage > 0.0 && attacker != enemy)
 					{
 						dmg_kill_player(enemy, attacker, Damage, "fireball");
@@ -135,7 +161,7 @@ public Entity_Touched(ent, victim)
 				}
 			}
 		}
-
+		*/
 		set_pev( ent, pev_flags, FL_KILLME);
 	}
 }
@@ -182,7 +208,7 @@ public Set_Sprite_FireBolt(id, const sprite[], Float:framerate, Float:scale, con
 
 	entity_set_edict( sprite_ent, EV_ENT_owner, id)
 
-	entity_set_size( sprite_ent, Float:{-2.1, -2.1, -2.1}, Float:{2.1, 2.1, 2.1})
+	entity_set_size( sprite_ent, Float:{-0.3, -0.3, -0.3}, Float:{0.3, 0.3, 0.3})
 
 	entity_set_int( sprite_ent, EV_INT_rendermode, kRenderTransAdd)
 	entity_set_float( sprite_ent, EV_FL_renderamt, 200.0 )
@@ -210,7 +236,7 @@ public Set_Sprite_FireBolt(id, const sprite[], Float:framerate, Float:scale, con
 	entity_set_vector( sprite_ent, EV_VEC_angles, fAngles)
 	
 	new Float:fVel[3]
-	velocity_by_aim(id, 500, fVel)	
+	velocity_by_aim(id, 1500, fVel)	
 
 	entity_set_vector( sprite_ent, EV_VEC_velocity, fVel)
 }

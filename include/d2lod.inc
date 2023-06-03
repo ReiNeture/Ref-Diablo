@@ -154,6 +154,9 @@ native is_freezetime();
 // 檢查玩家是否靠近怪物
 native bool:IsPlayerNearByMonster(id);
 
+// 取得角色魔力點數
+native get_p_magic(id);
+
 // 對玩家造成傷害,第一個參數是受害者,第二個參數是攻擊者,第三個參數是傷害,第四個參數是攻擊類型.
 native dmg_kill_player(id, attacker, Float:damage, weaponDescription[])
 

@@ -153,7 +153,7 @@ new const g_crossbow_shoot_sound[] = "weapons/xbow_fire1.wav";
 
 new const Custom_Models[MAX_HEROES][] = 
 {
-	"black_knight",
+	"genshin_klee",
 	"black_knight",
 	"black_knight",
 	"black_knight",
@@ -187,8 +187,8 @@ new const Diablo2_Fake_Player_Name[] =  "Diablo II LOD - Fake Player";
 
 new const HEROES[MAX_HEROES][] = 
 {
-    "亞馬遜",
-    "刺客",
+    "可莉",
+    "錦木千束",
     "法師",
     "野蠻人",
     "聖劍士",
@@ -248,11 +248,11 @@ new const Potion_Multi[MAX_POTIONS] = {
 /*================================================================================
 [可編譯的數值.]
 =================================================================================*/
-new const Float:HEROES_REGAIN_MANA[MAX_HEROES] = { 5.0, 5.0, 4.0, 5.0, 4.0, 4.0, 4.0 }; // 各職業能量的回覆時間(秒)
+new const Float:HEROES_REGAIN_MANA[MAX_HEROES] = { 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0 }; // 各職業能量的回覆時間(秒)
 
 new const HEROES_DEFENCE_DEXTERITY[MAX_HEROES] = { 1, 2, 1, 1, 3, 2, 1 }; // 各職業的1點護甲增加多少防禦力.
 
-new const Float: HEROES_STRENGTH_PERSTAT[MAX_HEROES] = { 0.6, 0.8, 0.5, 0.9, 0.7, 0.6, 0.5 }; // 各職業的1點敏捷增加多少迴避率.
+new const Float: HEROES_STRENGTH_PERSTAT[MAX_HEROES] = { 0.6, 0.8, 0.5, 0.9, 0.7, 0.6, 0.5 }; // 各職業的1點力量增加多少傷害.
 new const HEROES_DEXTERITY_PERSTAT[MAX_HEROES] = { 3, 4, 2, 4, 3, 3, 2 }; // 各職業的1點敏捷增加多少迴避率.
 new const HEROES_VITALITY_PERSTAT[MAX_HEROES] = { 2, 2, 1, 3, 2, 3, 1 }; // 各職業的1點體力增加多少血量最大值.
 new const HEROES_ENERGY_PERSTAT[MAX_HEROES] = { 2, 2, 4, 1, 2, 3, 4 }; // 各職業的1點能量增加多少最大能量值.

@@ -2,6 +2,7 @@
 #include <d2lod>
 #include <fakemeta>
 #include <engine>
+#include <hamsandwich>
 
 new PLUGIN_NAME[] = "流星攻擊"
 new PLUGIN_AUTHOR[] = "xbatista"
@@ -20,7 +21,7 @@ new const FireSpr[] = "sprites/flame.spr";
 
 new const SorcaManaMeteor[MAX_P_SKILLS] =  // 流星攻擊需要的能量.
 {
-	17, 17, 18, 19, 22, 24, 26, 28, 30, 32, 34, 36, 38, 39, 40, 41, 42, 43, 44, 45
+	200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200
 };
 new const Float:MeteorDamage[MAX_P_SKILLS] =  // 術士流星攻擊的傷害.
 {
@@ -47,7 +48,7 @@ public plugin_init()
 {
 	register_plugin(PLUGIN_NAME, PLUGIN_VERSION, PLUGIN_AUTHOR)
 
-	g_SkillId = register_d2_skill(PLUGIN_NAME, "降下流星雨攻擊你的敵人.", SORCERESS, Skill_Level, DISPLAY)
+	g_SkillId = register_d2_skill(PLUGIN_NAME, "降下流星雨攻擊你的敵人.", AMAZON, Skill_Level, DISPLAY)
 
 	register_forward(FM_Touch, "Entity_Touched");
 
@@ -79,7 +80,7 @@ public d2_skill_fired(id)
 	if ( g_iCurSkill[id] == g_SkillId )
 	{
 		static Float:cdown;
-		cdown = 2.5;
+		cdown = 0.7;
 
 		if (get_gametime() - g_LastPressedSkill[id] <= cdown) 
 		{
@@ -121,7 +122,7 @@ public Entity_Touched(ent, victim)
 	
 	if( equal(classname,"Meteor") ) 
 	{
-		new Float: Torigin[3], Float: Distance, Float: Damage;
+		new Float:Torigin[3], Float:Distance, Float:Damage;
 
 		new Float:fOrigin[3], iOrigin[3];
 		entity_get_vector( ent, EV_VEC_origin, fOrigin)	
@@ -148,18 +149,33 @@ public Entity_Touched(ent, victim)
 		set_task( 0.2, "Task_Burn", TASKID_BURN, Param, sizeof Param, "b");
 		set_task( END_BURN_TIME, "Burn_End");
 
+		Damage = MeteorDamage[get_p_skill(attacker, g_SkillId) - 1] + float(get_p_magic(attacker)) * 0.6;
+		new npcname[32];
+		new victim = FM_NULLENT;
+
+		while( (victim = engfunc(EngFunc_FindEntityInSphere, victim, fOrigin, RADIUS_DAMAGE) ) != 0 ) {
+
+			pev(victim, pev_classname, npcname, sizeof(npcname));
+			if( is_user_alive(victim) && attacker != victim && !IsPlayerNearByMonster(victim) && !is_p_protected(victim) && get_p_skill(attacker, g_SkillId) > 0 )
+			{
+				dmg_kill_player(victim, attacker, Damage, "fireball");
+			}
+			else if( !is_user_alive(victim) && equal(npcname, "func_wall") )
+			{
+				ExecuteHam(Ham_TakeDamage, victim, ent, attacker, Damage, DMG_BURN);
+			}
+		}
+
+		/*
 		for(new enemy = 1; enemy <= g_iMaxPlayers; enemy++) 
 		{
 			if ( is_user_alive(enemy) )
 			{
 				entity_get_vector( enemy, EV_VEC_origin, Torigin)
-
 				Distance = get_distance_f(fOrigin, Torigin);
-
 				if ( Distance <= RADIUS_DAMAGE && !IsPlayerNearByMonster(enemy) && !is_p_protected(enemy) && get_p_skill( attacker, g_SkillId ) > 0 )
 				{
 					Damage = (((Distance / RADIUS_DAMAGE) * MeteorDamage[get_p_skill( attacker, g_SkillId ) - 1]) - MeteorDamage[get_p_skill( attacker, g_SkillId ) - 1]) * -1.0;
-
 					if (Damage > 0.0 && attacker != enemy)
 					{
 						dmg_kill_player(enemy, attacker, Damage, "meteor");
@@ -167,6 +183,7 @@ public Entity_Touched(ent, victim)
 				}
 			}
 		}
+		*/
 
 		set_pev( ent, pev_flags, FL_KILLME);
 	}
@@ -237,7 +254,7 @@ public Task_Warn(AimOrigin[3], id)
 	engfunc( EngFunc_WriteCoord, float(AimOrigin[2]) - 16.0);
 	engfunc( EngFunc_WriteCoord, float(AimOrigin[0]));
 	engfunc( EngFunc_WriteCoord, float(AimOrigin[1]));
-	engfunc( EngFunc_WriteCoord, float(AimOrigin[2]) - 16.0 + RADIUS_DAMAGE + 100.0);
+	engfunc( EngFunc_WriteCoord, float(AimOrigin[2]) - 16.0 + RADIUS_DAMAGE + 200.0);
 	write_short( g_spriteShockwave );
 	write_byte( 0 );	// 幀幅開始.
 	write_byte( 0 );	// 幀幅頻率.
@@ -255,20 +272,18 @@ public Task_Warn(AimOrigin[3], id)
 public Task_Meteor(AimOrigin[], id)
 {
 	id -= TASKID_METEOR;
-
 	if ( !is_user_connected(id) )
 		return;
 
 	remove_task( id + TASKID_WARN);
 
 	new RandomX, RandomY, RandomOrigin[3], EndOrigin[3];
-
 	AimOrigin[2] += 230;
 
-	for ( new i = 0; i < 6; i++)
+	for ( new i = 1; i <= 7; i++)
 	{
-		RandomX = random_num(-115,115)
-		RandomY = random_num(-115,115)
+		RandomX = random_num(-250, 250)
+		RandomY = random_num(-250, 250)
 
 		RandomOrigin[0] = AimOrigin[0] + 1 * RandomX;
 		RandomOrigin[1] = AimOrigin[1] + 1 * RandomY;

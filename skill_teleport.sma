@@ -27,7 +27,7 @@ public plugin_init()
 {
 	register_plugin(PLUGIN_NAME, PLUGIN_VERSION, PLUGIN_AUTHOR)
 
-	g_SkillId = register_d2_skill(PLUGIN_NAME, "傳送自己.", SORCERESS, Skill_Level, DISPLAY)
+	g_SkillId = register_d2_skill(PLUGIN_NAME, "傳送自己.", AMAZON, Skill_Level, DISPLAY)
 }
 
 public plugin_precache()
@@ -46,7 +46,7 @@ public d2_skill_fired(id)
 	if ( g_iCurSkill[id] == g_SkillId )
 	{
 		static Float:cdown;
-		cdown = 1.2;
+		cdown = 1.0;
 
 		if (get_gametime() - g_LastPressedSkill[id] <= cdown) 
 		{
