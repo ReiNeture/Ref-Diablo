@@ -97,6 +97,8 @@ public plugin_init()
 	g_DaggerPoisonDamage = CreateMultiForward("d2_dagger_poisondamage", ET_IGNORE, FP_CELL, FP_CELL, FP_ARRAY);
 	g_ActRangedShoot = CreateMultiForward("d2_ranged_actshoot", ET_IGNORE, FP_CELL, FP_CELL);
 	
+	gBuyCharacterMenu = B1 | B2 | B3 | B4 | B5 | B6 | B7 | B8 | B9 | B0;
+	register_menucmd(register_menuid("BuyChisatoMenu"), gBuyCharacterMenu, "buy_chisato_menu");
 	
 	// 其他.
 	g_iMaxPlayers = get_maxplayers();
@@ -129,6 +131,7 @@ public plugin_init()
 	set_task( 1.0, "Spawn_Items");
 	set_task( 1.0, "Spawn_Items_Charsi")
 	set_task( 1.0, "Spawn_Items_Akara")
+	set_task( 1.0, "Spawn_Items_Miyu")
 
 	g_FakeEnt = create_entity( "info_target" );
 }
@@ -252,6 +255,7 @@ public plugin_precache()
 	engfunc(EngFunc_PrecacheModel, g_w_inventory);
 	engfunc(EngFunc_PrecacheModel, g_w_charsi);
 	engfunc(EngFunc_PrecacheModel, g_w_akara);
+	engfunc(EngFunc_PrecacheModel, g_w_miyu);
 	engfunc(EngFunc_PrecacheModel, g_brassknuckles);
 
 	engfunc(EngFunc_PrecacheModel, g_w_crossbow);
@@ -325,6 +329,7 @@ public plugin_cfg()
 		Load_Origins(CurMap);
 		Load_Origins_Charsi(CurMap);
 		Load_Origins_Akara(CurMap);
+		Load_Origins_Miyu(CurMap);
 	}
 
 	// 開啟Vault讀取程序.
@@ -450,6 +455,27 @@ public bool:native_get_p_near_akara(id)
 		pev( ent, pev_classname, classname, charsmax(classname) );
 
 		if( equal(classname, "Akara") )
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+public bool:native_get_p_near_miyu(id)
+{
+	if ( !is_user_alive(id) || DISTANCE_INVENTORY_PLAYER <= 0.0 ) return false;
+
+	new Float:Porigin[3];
+	entity_get_vector( id, EV_VEC_origin, Porigin);
+
+	new ent = -1
+	while( (ent = find_ent_in_sphere( ent, Porigin, DISTANCE_INVENTORY_PLAYER)) != 0) 
+	{
+		static classname[32];
+		pev( ent, pev_classname, classname, charsmax(classname) );
+
+		if( equal(classname, "Miyu") )
 		{
 			return true;
 		}

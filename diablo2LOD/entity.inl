@@ -160,7 +160,32 @@ Create_Akara(Origin[3])
 		entity_set_vector(akar_ent, EV_VEC_origin, flOrigin)
 		
 		entity_set_model(akar_ent, g_w_akara)
-		entity_set_size(akar_ent, Float:{-12.5, -12.5, -56.5}, Float:{12.5, 12.5, 66.5})		
+		entity_set_size(akar_ent, Float:{-12.5, -12.5, -56.5}, Float:{12.5, 12.5, 66.5})
+		entity_set_float(akar_ent,EV_FL_nextthink,halflife_time() + 0.01)
+	}
+}
+
+Create_Miyu(Origin[3])
+{
+	new Float:flOrigin[3]
+	IVecFVec(Origin, flOrigin)
+
+	new akar_ent = create_entity("info_target")
+
+	if(pev_valid(akar_ent))
+	{
+		entity_set_string(akar_ent, EV_SZ_classname, "Miyu")
+				
+		entity_set_int(akar_ent, EV_INT_solid, SOLID_BBOX)
+		entity_set_int(akar_ent, EV_INT_movetype, MOVETYPE_NONE)
+		entity_set_edict(akar_ent, EV_ENT_owner, 0)
+
+		drop_to_floor(akar_ent)
+
+		entity_set_vector(akar_ent, EV_VEC_origin, flOrigin)
+		
+		entity_set_model(akar_ent, g_w_miyu)
+		entity_set_size(akar_ent, Float:{-12.5, -12.5, -12.5}, Float:{12.5, 12.5, 32.5})		
 		entity_set_float(akar_ent,EV_FL_nextthink,halflife_time() + 0.01)
 	}
 }
@@ -199,6 +224,21 @@ Save_Origin_Akara(CurMap[], Origin[3])
 {	
 	new MapFile[64], Text[64]
 	format(MapFile, 63, "%s/%s_akara.cfg", g_ItemOriginDir, CurMap)
+
+	if(!file_exists(MapFile)) 
+	{
+		new Comments[64]
+		format(Comments, 63, "; %s 的地圖道具座標.", CurMap)
+		write_file(MapFile, Comments, -1)
+	}
+	
+	format(Text, 63, "%i %i %i", Origin[0], Origin[1], Origin[2])
+	write_file(MapFile, Text, -1)
+}
+Save_Origin_Miyu(CurMap[], Origin[3])
+{	
+	new MapFile[64], Text[64]
+	format(MapFile, 63, "%s/%s_miyu.cfg", g_ItemOriginDir, CurMap)
 
 	if(!file_exists(MapFile)) 
 	{
@@ -286,9 +326,9 @@ Load_Origins_Charsi(CurMap[])
 		parse(Text, iOrigin[0], 15, iOrigin[1], 15, iOrigin[2], 15)
 		
 		g_MapItemNum1++
-		g_MapItemOrgins1[g_MapItemNum][0] = str_to_num(iOrigin[0])
-		g_MapItemOrgins1[g_MapItemNum][1] = str_to_num(iOrigin[1])
-		g_MapItemOrgins1[g_MapItemNum][2] = str_to_num(iOrigin[2])
+		g_MapItemOrgins1[g_MapItemNum1][0] = str_to_num(iOrigin[0])
+		g_MapItemOrgins1[g_MapItemNum1][1] = str_to_num(iOrigin[1])
+		g_MapItemOrgins1[g_MapItemNum1][2] = str_to_num(iOrigin[2])
 	}
 	
 	return PLUGIN_CONTINUE
@@ -327,9 +367,50 @@ Load_Origins_Akara(CurMap[])
 		parse(Text, iOrigin[0], 15, iOrigin[1], 15, iOrigin[2], 15)
 		
 		g_MapItemNum2++
-		g_MapItemOrgins2[g_MapItemNum][0] = str_to_num(iOrigin[0])
-		g_MapItemOrgins2[g_MapItemNum][1] = str_to_num(iOrigin[1])
-		g_MapItemOrgins2[g_MapItemNum][2] = str_to_num(iOrigin[2])
+		g_MapItemOrgins2[g_MapItemNum2][0] = str_to_num(iOrigin[0])
+		g_MapItemOrgins2[g_MapItemNum2][1] = str_to_num(iOrigin[1])
+		g_MapItemOrgins2[g_MapItemNum2][2] = str_to_num(iOrigin[2])
+	}
+	
+	return PLUGIN_CONTINUE
+}
+Load_Origins_Miyu(CurMap[])
+{
+	new MapFile[64]
+	format(MapFile, 63, "%s/%s_miyu.cfg", g_ItemOriginDir, CurMap)
+
+	if(!file_exists(MapFile))
+		return PLUGIN_CONTINUE;
+
+	g_MapItemNum3 = 0
+	for(new i = 1; i <= MAX_MAPITEMS; ++i) 
+	{
+		g_MapItemOrgins3[i][0] = 0
+		g_MapItemOrgins3[i][1] = 0
+		g_MapItemOrgins3[i][2] = 0
+	}
+	
+	new Text[64], Line = 0, Len = 0;
+
+	while(read_file(MapFile, Line++, Text, 63, Len))
+	{
+		if((Text[0]==';') || !Len) {
+		 	continue
+		}
+		
+		if(g_MapItemNum3 >= MAX_MAPITEMS) 
+		{
+			log_amx("達到地圖道具最大數量,請增加MAX_MAPITEMS.")
+			break
+		}
+		
+		new iOrigin[3][16];
+		parse(Text, iOrigin[0], 15, iOrigin[1], 15, iOrigin[2], 15)
+		
+		g_MapItemNum3++
+		g_MapItemOrgins3[g_MapItemNum3][0] = str_to_num(iOrigin[0])
+		g_MapItemOrgins3[g_MapItemNum3][1] = str_to_num(iOrigin[1])
+		g_MapItemOrgins3[g_MapItemNum3][2] = str_to_num(iOrigin[2])
 	}
 	
 	return PLUGIN_CONTINUE
@@ -369,6 +450,18 @@ public Spawn_Items_Akara()
 				continue
 		}
 		Create_Akara(g_MapItemOrgins2[i]);
+	}
+}
+public Spawn_Items_Miyu()
+{
+	for(new i = 1; i <= MAX_MAPITEMS; ++i)
+	{
+		if((g_MapItemOrgins3[i][0] == 0) 
+		&& (g_MapItemOrgins3[i][1] == 0) 
+		&& g_MapItemOrgins3[i][2] == 0) { 
+				continue
+		}
+		Create_Miyu(g_MapItemOrgins3[i]);
 	}
 }
 
@@ -429,6 +522,25 @@ RemoveMapItems_Akara()
 		g_MapItemOrgins2[i][2] = 0
 	}
 }
+RemoveMapItems_Miyu()
+{
+	new MapFile[64], CurMap[32];
+	get_mapname(CurMap, 31);
+	format(MapFile, 63, "%s/%s_miyu.cfg", g_ItemOriginDir, CurMap);
+
+	if(file_exists(MapFile)) {
+		delete_file(MapFile)
+	}
+
+	g_MapItemNum2 = 0
+
+	for(new i = 1; i <= MAX_MAPITEMS; ++i) 
+	{
+		g_MapItemOrgins3[i][0] = 0
+		g_MapItemOrgins3[i][1] = 0
+		g_MapItemOrgins3[i][2] = 0
+	}
+}
 
 public Remove_All_Inventory_Ents()
 {
@@ -458,6 +570,16 @@ public Remove_All_Akara_Ents()
 	{
 		remove_entity(akara_ent)
 		akara_ent = find_ent_by_class(akara_ent, "Akara")
+	}
+}
+public Remove_All_Miyu_Ents()
+{
+	new miyu_ent = find_ent_by_class(-1, "Miyu")
+	
+	while ( miyu_ent ) 
+	{
+		remove_entity(miyu_ent)
+		miyu_ent = find_ent_by_class(miyu_ent, "Miyu")
 	}
 }
 

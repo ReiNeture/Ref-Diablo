@@ -109,7 +109,7 @@ public fm_set_user_model( id, Model[])
 	return 1
 }
 
-public register_skill( skill_index, skill_name[], skill_desc[], skill_hero, skill_level, skill_display )
+public register_skill( skill_index, skill_name[], skill_desc[], skill_hero, skill_level, skill_max, skill_display )
 {
 	if( g_skillcounter == MAX_PLUGIN_SKILLS )
 	{
@@ -126,6 +126,7 @@ public register_skill( skill_index, skill_name[], skill_desc[], skill_hero, skil
 	g_skillhero[g_skillcounter] = skill_hero;
 	g_skilllevel[skill_hero][g_skillcounter] = skill_level;
 	g_skilldisplay[g_skillcounter] = skill_display;
+	g_skillmax[g_skillcounter] = skill_max;
 
 	return g_skillcounter;
 }

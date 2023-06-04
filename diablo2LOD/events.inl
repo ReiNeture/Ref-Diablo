@@ -4,6 +4,7 @@ public Event_New_Round()
 	set_task( 0.5, "Spawn_Items");
 	set_task( 0.5, "Spawn_Items_Charsi");
 	set_task( 0.5, "Spawn_Items_Akara");
+	set_task( 0.5, "Spawn_Items_Miyu");
 
 	g_FreezeTime = true;
 }
@@ -21,6 +22,7 @@ public Event_Round_End()
 	Remove_All_Inventory_Ents();
 	Remove_All_Charsi_Ents();
 	Remove_All_Akara_Ents();
+	Remove_All_Miyu_Ents();
 }
 
 public Ev_CurWeapon(id)

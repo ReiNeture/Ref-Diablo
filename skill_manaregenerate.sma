@@ -8,10 +8,11 @@ new PLUGIN_AUTHOR[] = "xbatista"
 new PLUGIN_VERSION[] = "1.0"
 
 new Skill_Level = 24;
+new Skill_Allocate = 10;
 
 new const ManaRegenerate[MAX_P_SKILLS] = 
 {
-	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 14, 15, 16, 17, 18, 19, 20, 25, 26, 30
+	14, 15, 16, 17, 18, 19, 20, 25, 26, 30
 };
 
 new g_SkillId;
@@ -22,7 +23,7 @@ public plugin_init()
 {
 	register_plugin(PLUGIN_NAME, PLUGIN_VERSION, PLUGIN_AUTHOR)
 	RegisterHam(Ham_TakeDamage, "func_wall", "fwd_PlayerDamagedMonster");
-	g_SkillId = register_d2_skill(PLUGIN_NAME, "攻擊時回復魔力.", AMAZON, Skill_Level, NOT_DISPLAY)
+	g_SkillId = register_d2_skill(PLUGIN_NAME, "攻擊時回復魔力.", AMAZON, Skill_Level, Skill_Allocate, NOT_DISPLAY)
 }
 
 public d2_skill_selected(id, skill_id)

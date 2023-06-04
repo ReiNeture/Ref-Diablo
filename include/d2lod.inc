@@ -193,7 +193,7 @@ stock find_itemindex()
 
  	return -1
 }
-stock register_d2_skill(skill_name[], skill_desc[], skill_hero, skill_level, skill_display)
+stock register_d2_skill(skill_name[], skill_desc[], skill_hero, skill_level, skill_max, skill_display)
 {
 	new SkillId = find_itemindex()
 	new SkillPlugin = find_itemplugin()
@@ -211,6 +211,7 @@ stock register_d2_skill(skill_name[], skill_desc[], skill_hero, skill_level, ski
 	callfunc_push_str(skill_desc)
 	callfunc_push_int(skill_hero)
 	callfunc_push_int(skill_level)
+	callfunc_push_int(skill_max)
 	callfunc_push_int(skill_display)
 	
 	temp = callfunc_end()

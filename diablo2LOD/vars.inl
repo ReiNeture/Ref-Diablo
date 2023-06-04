@@ -70,11 +70,13 @@ new bool: g_FreezeTime;
 // 不是給玩家用的字元.
 new g_charcounter = -1;
 new g_skillcounter = -1;
+new gBuyCharacterMenu;
 
 new g_skillindex[MAX_HEROES][MAX_PLUGIN_SKILLS + 1];
 new g_skillhero[MAX_PLUGIN_SKILLS + 1];
 new g_skilldisplay[MAX_PLUGIN_SKILLS + 1];
 new g_skilllevel[MAX_HEROES][MAX_PLUGIN_SKILLS + 1];
+new g_skillmax[MAX_PLUGIN_SKILLS + 1];
 new g_skillname[MAX_HEROES][MAX_PLUGIN_SKILLS + 1][MAX_SKILL_NAME_SIZE + 1];
 new g_skilldesc[MAX_HEROES][MAX_PLUGIN_SKILLS + 1][MAX_SKILL_DESC_SIZE + 1];
 
@@ -101,3 +103,6 @@ new g_MapItemOrgins1[MAX_MAPITEMS+1][3];
 // 藥水商人.
 new g_MapItemNum2;
 new g_MapItemOrgins2[MAX_MAPITEMS+1][3];
+// 角色商人.
+new g_MapItemNum3;
+new g_MapItemOrgins3[MAX_MAPITEMS+1][3];

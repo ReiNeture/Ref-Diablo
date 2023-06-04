@@ -7,11 +7,10 @@ public main_hero_menu_connect(id)
 	formatex(szMsg, 59, "主選單 : ")
 	
 	new menu = menu_create(szMsg , "hero_menu_connect");
-	if ( g_PlayerChars[id] < 1 )
-		menu_additem(menu, "創造初始角色", "0", 0);
+	menu_additem(menu, "創造初始角色", "0", 0);
 	if ( g_PlayerChars[id] > 0 )
 		menu_additem(menu, "選擇角色", "1", 0);
-	// menu_additem(menu, "刪除角色", "2", 0);
+	menu_additem(menu, "刪除角色", "2", 0);
 	
 	menu_setprop(menu , MPROP_EXIT , MEXIT_ALL);
 	menu_display(id , menu , 0); 
@@ -81,9 +80,10 @@ public main_hero_menu(id)
 }
 public hero_menu(id , menu , item) 
 { 
-	if ( !is_user_connected(id) || g_PlayerChars[id] >= MAX_CHARS )
+	if ( !is_user_connected(id) || g_PlayerChars[id] >= 1 )
 	{
-		client_printcolor( id, "/y你的角色太多了 (/ctr%d/y) !", MAX_CHARS )
+		// client_printcolor( id, "/y你的角色太多了 (/ctr%d/y) !", MAX_CHARS )
+		client_printcolor( id, "/y你已經有初始角色了!")
 		main_hero_menu_connect(id)
 		return PLUGIN_HANDLED;
 	}
@@ -502,7 +502,7 @@ public main_skill_menu(id)
 		return;
 
 	new szInfo[60];
-	formatex(szInfo, 59, "職業: \r%s", HEROES[g_PlayerHero[id][g_CurrentChar[id]]])
+	formatex(szInfo, 59, "職業: \r%s \d- \ySP\d[ \r%d \d]", HEROES[g_PlayerHero[id][g_CurrentChar[id]]], g_PlayerSkPoints[id][g_CurrentChar[id]])
 
 	new menu = menu_create(szInfo , "skill_menu");
 
@@ -513,8 +513,13 @@ public main_skill_menu(id)
 		if ( g_PlayerHero[id][g_CurrentChar[id]] == g_skillhero[skill_id] )
 		{
 			new szItems[90];
-			formatex(szItems, 89, "%s \d( \y%d \d) %s - 需要等級 %s%d", g_skillname[g_PlayerHero[id][g_CurrentChar[id]]][skill_id], g_iSkills[id][g_CurrentChar[id]][skill_id], (g_skilldisplay[skill_id] ? "" : "\w[ \yPassive \w]\d" ),
-			(g_PlayerLevel[id][g_CurrentChar[id]] < g_skilllevel[g_PlayerHero[id][g_CurrentChar[id]]][skill_id] ? "\r" : "\y"), g_skilllevel[g_PlayerHero[id][g_CurrentChar[id]]][skill_id] )
+			formatex(szItems, 89, "%s \d( \y%d/%d \d) %s - 需要等級 %s%d", 
+				g_skillname[g_PlayerHero[id][g_CurrentChar[id]]][skill_id], 
+				g_iSkills[id][g_CurrentChar[id]][skill_id], 
+				g_skillmax[skill_id], 
+				(g_skilldisplay[skill_id] ? "" : "\w[ \yPassive \w]\d" ), 
+				(g_PlayerLevel[id][g_CurrentChar[id]] < g_skilllevel[g_PlayerHero[id][g_CurrentChar[id]]][skill_id] ? "\r" : "\y"), 
+				g_skilllevel[g_PlayerHero[id][g_CurrentChar[id]]][skill_id] )
 
 			num_to_str(skill_id, szTempid, 31);
 
@@ -541,7 +546,6 @@ public skill_menu(id , menu , item)
 	menu_item_getinfo(menu, item, access, data,5, iName, 63, callback);
 
 	new skill_id = str_to_num(data);
-
 	if ( g_PlayerLevel[id][g_CurrentChar[id]] < g_skilllevel[g_PlayerHero[id][g_CurrentChar[id]]][skill_id] )
 	{
 		client_printcolor(id, "/y需要 /g%d 等", g_skilllevel[g_PlayerHero[id][g_CurrentChar[id]]][skill_id]);
@@ -549,9 +553,9 @@ public skill_menu(id , menu , item)
 		return PLUGIN_HANDLED;
 	}
 
-	if ( g_iSkills[id][g_CurrentChar[id]][skill_id] >= MAX_SKILLS )
+	if ( g_iSkills[id][g_CurrentChar[id]][skill_id] >= g_skillmax[skill_id] )
 	{
-		client_printcolor(id, "/ctr%s 的等級已達到 /g%d!", g_skillname[g_PlayerHero[id][g_CurrentChar[id]]][skill_id], MAX_SKILLS);
+		client_printcolor(id, "/ctr%s 的等級已達到 /g%d!", g_skillname[g_PlayerHero[id][g_CurrentChar[id]]][skill_id], g_skillmax[skill_id]);
 
 		return PLUGIN_HANDLED;
 	}
@@ -578,9 +582,11 @@ public Open_MapItemConfig(id)
 		menu_additem(menu ,"創造倉庫 ", "1" , 0); 
 		menu_additem(menu ,"創造武器商人", "2" , 0); 
 		menu_additem(menu ,"創造藥水商人", "3" , 0); 
-		menu_additem(menu ,"刪除所有倉庫", "4" , 0); 
-		menu_additem(menu ,"刪除所有武器商人", "5" , 0); 
-		menu_additem(menu ,"刪除所有藥水商人", "6" , 0); 
+		menu_additem(menu ,"創造角色商人", "4" , 0); 
+		menu_additem(menu ,"刪除所有倉庫", "5" , 0); 
+		menu_additem(menu ,"刪除所有武器商人", "6" , 0); 
+		menu_additem(menu ,"刪除所有藥水商人", "7" , 0); 
+		menu_additem(menu ,"刪除所有角色商人", "8" , 0); 
 		
 		menu_setprop(menu , MPROP_EXIT , MEXIT_ALL);
 		menu_display(id , menu , 0); 
@@ -663,23 +669,47 @@ public map_item_menu(id , menu , item)
 			Open_MapItemConfig(id)
 			client_print(id, print_chat, "藥水商人以創造!")
 		}
-		case 4: 
+		case 4: // 角色商人.
+		{
+			if(g_MapItemNum >= MAX_MAPITEMS)
+			{
+				client_print(id, print_chat, "達到地圖最大限制!")
+				return PLUGIN_HANDLED
+			}
+			
+			new Origin[3]
+			get_user_origin(id, Origin, 3)
+			Origin[2] += 32
+			Create_Miyu(Origin)
+			Save_Origin_Miyu(MapName, Origin)
+			Load_Origins_Miyu(MapName)
+			
+			Open_MapItemConfig(id)
+			client_print(id, print_chat, "角色商人以創造!")
+		}
+		case 5: 
 		{
 			RemoveMapItems()
 			Remove_All_Inventory_Ents();
 			client_print(id, print_chat, "所有倉庫已刪除!")
 		}
-		case 5: 
+		case 6: 
 		{
 			RemoveMapItems_Charsi()
 			Remove_All_Charsi_Ents();
 			client_print(id, print_chat, "所有武器商人已刪除!")
 		}
-		case 6: 
+		case 7: 
 		{
 			RemoveMapItems_Akara()
 			Remove_All_Akara_Ents();
 			client_print(id, print_chat, "所有藥水商人已刪除!")
+		}
+		case 8: 
+		{
+			RemoveMapItems_Miyu()
+			Remove_All_Miyu_Ents();
+			client_print(id, print_chat, "所有角色商人已刪除!")
 		}
 	}
 	
@@ -1137,6 +1167,82 @@ public akara_sell_menu(id , menu , item)
 
 	menu_destroy(menu); 
 	return PLUGIN_HANDLED;
+}
+
+public main_miyu_menu(id)
+{
+	new szInfo[60];
+	formatex(szInfo, 59, "角色數量 \d[ \y%d \d] - \r角色商人", g_PlayerChars[id])
+	new menu = menu_create(szInfo , "miyu_menu");
+	menu_additem(menu , "購買錦木千束", "1" , 0); 
+
+	menu_setprop(menu , MPROP_EXIT , MEXIT_ALL);
+	menu_display(id , menu , 0); 
+}
+public miyu_menu(id , menu , item) 
+{ 
+	if ( !native_get_p_near_miyu(id) )
+		return PLUGIN_HANDLED;
+
+	if(item == MENU_EXIT) 
+	{ 
+		menu_destroy(menu); 
+		return PLUGIN_HANDLED;
+	} 
+	new data[6], iName[64];
+	new access, callback;
+	menu_item_getinfo(menu, item, access, data,5, iName, 63, callback);
+
+	new key = str_to_num(data);
+	switch(key) {
+		case 1: main_buy_chisato_menu(id);
+	}
+	menu_destroy(menu); 
+	return PLUGIN_HANDLED;
+}
+
+public main_buy_chisato_menu(id)
+{
+	new szMenu[256];
+	new szTitle[64];
+
+	format(szTitle, sizeof(szTitle), "\w確定購買 \r錦木千束 \w?^n");
+	add(szMenu, sizeof(szMenu), szTitle);
+	add(szMenu, sizeof(szMenu), "\w需要 \r100,000 \w金錢^n^n");
+	add(szMenu, sizeof(szMenu), "\y7. \w確定^n");
+	add(szMenu, sizeof(szMenu), "\y8. \w不要");
+	show_menu(id, gBuyCharacterMenu, szMenu, -1, "BuyChisatoMenu");
+}
+
+public buy_chisato_menu(id, num) 
+{
+	switch(num) {
+		case N7: {
+
+			if( g_Coins[id][g_CurrentChar[id]] < 100000 ) {
+				client_printcolor(id, "/y金錢不足! 你的錢:/g%d", g_Coins[id][g_CurrentChar[id]])
+				return;
+			}
+
+			for(new i = 0; i <= MAX_CHARS; ++i) {
+				if( g_PlayerHero[id][i] == ASSASSIN && g_PlayerCharActive[id][i] ) {
+					client_printcolor(id, "/y你已經有這個角色了! 無法再購買")
+					return;
+				}
+			}
+			
+			new Val;
+			g_PlayerChars[id]++;
+			for (new hero_id = 0; hero_id < g_PlayerChars[id]; hero_id++)
+			{
+				if ( !g_PlayerCharActive[id][hero_id] )
+					Val = hero_id;
+			}
+			g_PlayerCharActive[id][Val] = CHAR_ACTIVE;
+			g_PlayerHero[id][Val] = ASSASSIN;
+			client_printcolor( id, "/y角色 /g%s /y以創造, 角色數量 : /ctr%d", HEROES[ASSASSIN], g_PlayerChars[id]);
+		}
+	}
 }
 
 public main_worn_menu(id)

@@ -8,7 +8,8 @@ new PLUGIN_NAME[] = "流星攻擊"
 new PLUGIN_AUTHOR[] = "xbatista"
 new PLUGIN_VERSION[] = "1.0"
 
-new Skill_Level = 30;
+new Skill_Level = 50;
+new Skill_Allocate = 20;
 
 new const SorcMeteorCast[] = "d2lod/meteorlaunch.wav";
 new const SorcMeteorMdl[] = "models/d2lod/head.mdl";
@@ -48,7 +49,7 @@ public plugin_init()
 {
 	register_plugin(PLUGIN_NAME, PLUGIN_VERSION, PLUGIN_AUTHOR)
 
-	g_SkillId = register_d2_skill(PLUGIN_NAME, "降下流星雨攻擊你的敵人.", AMAZON, Skill_Level, DISPLAY)
+	g_SkillId = register_d2_skill(PLUGIN_NAME, "降下流星雨攻擊你的敵人.", AMAZON, Skill_Level, Skill_Allocate, DISPLAY)
 
 	register_forward(FM_Touch, "Entity_Touched");
 

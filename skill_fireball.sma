@@ -8,20 +8,25 @@ new PLUGIN_NAME[] = "爆炸火球"
 new PLUGIN_AUTHOR[] = "xbatista"
 new PLUGIN_VERSION[] = "1.0"
 
-new Skill_Level = 12;
+new Skill_Level = 5;
+new Skill_Allocate = 30;
 
 new const SorcFireCast[] = "d2lod/firecast.wav";
 new const OnPFireSpr[] = "sprites/xfire2.spr";
 new const FireCast[] = "sprites/rjet1.spr";
 new const g_SpriteExplode[] = "sprites/explosion1.spr";
 
-new const SorcaManaFireBall[MAX_P_SKILLS] =  // 發射火球需要的能量.
+new const SorcaManaFireBall[30] =  // 發射火球需要的能量.
 {
-	5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 14, 14, 15, 15, 15, 15, 16, 17, 18, 19
+	5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 
+	14, 14, 15, 15, 15, 15, 16, 17, 18, 19,
+	20, 21, 22, 23, 24, 25, 26, 27, 28, 29
 };
-new const Float:FireBallDamage[MAX_P_SKILLS] =  // 術士的火球傷害.
+new const Float:FireBallDamage[30] =  // 術士的火球傷害.
 {
-	10.0, 20.0, 25.0, 30.0, 35.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 110.0, 120.0, 125.0, 130.0, 140.0, 150.0, 155.0, 160.0
+	10.0, 20.0, 25.0, 30.0, 35.0, 40.0, 50.0, 60.0, 70.0, 80.0, 
+	90.0, 100.0, 110.0, 120.0, 125.0, 130.0, 140.0, 150.0, 155.0, 160.0,
+	170.0, 175.0, 180.0, 185.0, 190.0, 195.0, 200.0, 205.0, 210.0, 220.0
 };
 
 new g_SkillId;
@@ -29,17 +34,13 @@ new g_SkillId;
 new g_iCurSkill[33];
 new Float:g_LastPressedSkill[33];
 new g_spriteBall;
-new g_iMaxPlayers;
-new g_SyncHudCreate_Dmg;
 
 public plugin_init() 
 {
 	register_plugin(PLUGIN_NAME, PLUGIN_VERSION, PLUGIN_AUTHOR)
-	g_SkillId = register_d2_skill(PLUGIN_NAME, "發射一顆會爆炸的火球.", AMAZON, Skill_Level, DISPLAY)
+	g_SkillId = register_d2_skill(PLUGIN_NAME, "發射一顆會爆炸的火球.", AMAZON, Skill_Level, Skill_Allocate, DISPLAY)
+	
 	register_forward(FM_Touch, "Entity_Touched");
-
-	g_iMaxPlayers = get_maxplayers();
-	g_SyncHudCreate_Dmg = CreateHudSyncObj();
 }
 
 public plugin_precache()

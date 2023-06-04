@@ -386,6 +386,11 @@ public fwd_CmdStart(client, uc_handle, seed)
 				main_akara_menu(client)
 				return FMRES_IGNORED;
 			}
+			else if ( equal(classname, "Miyu") )
+			{
+				main_miyu_menu(client)
+				return FMRES_IGNORED;
+			}
 		}
 	}
 

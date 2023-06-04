@@ -9,13 +9,14 @@ new PLUGIN_AUTHOR[] = "xbatista"
 new PLUGIN_VERSION[] = "1.0"
 
 new Skill_Level = 18;
+new Skill_Allocate = 10;
 
 new const SorcTeleportSnd[] = "d2lod/teleport.wav";
 new const TeleportSpr[] = "sprites/rifle_smoke3.spr";
 
 new const SorcaManaTeleport[MAX_P_SKILLS] =  // 傳送需要的魔力.
 {
-	30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 10
+	20, 19, 18, 17, 16, 15, 14, 13, 12, 10
 };
 
 new g_SkillId;
@@ -27,7 +28,7 @@ public plugin_init()
 {
 	register_plugin(PLUGIN_NAME, PLUGIN_VERSION, PLUGIN_AUTHOR)
 
-	g_SkillId = register_d2_skill(PLUGIN_NAME, "傳送自己.", AMAZON, Skill_Level, DISPLAY)
+	g_SkillId = register_d2_skill(PLUGIN_NAME, "傳送自己.", AMAZON, Skill_Level, Skill_Allocate, DISPLAY)
 }
 
 public plugin_precache()

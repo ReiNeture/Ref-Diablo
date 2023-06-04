@@ -154,7 +154,7 @@ new const g_crossbow_shoot_sound[] = "weapons/xbow_fire1.wav";
 new const Custom_Models[MAX_HEROES][] = 
 {
 	"genshin_klee",
-	"black_knight",
+	"chisato",
 	"black_knight",
 	"black_knight",
 	"black_knight",
@@ -169,6 +169,7 @@ new const g_w_item[] = "models/skeleton.mdl";
 new const g_w_inventory[] = "models/d2lod/w_inventory.mdl";
 new const g_w_charsi[] = "models/d2lod/charsi2.mdl";
 new const g_w_akara[] = "models/d2lod/akara.mdl";
+new const g_w_miyu[] = "models/player/miyu/miyu.mdl";
 
 new const g_brassknuckles[] = "models/d2lod/v_knuckles.mdl";
 
@@ -195,7 +196,17 @@ new const HEROES[MAX_HEROES][] =
     "德魯伊",
     "術士"
 } 
-
+// 職業類型.
+enum
+{
+	AMAZON = 0,
+	ASSASSIN,
+	NECROMANCER,
+	BARBARIAN,
+	PALADIN,
+	DRUID,
+	SORCERESS
+}
 
 /*================================================================================
 [結束定義職業名稱.]
@@ -316,7 +327,15 @@ new const g_Objective_Ents[][] = {
 	"armoury_entity"
 }
 enum { USE_OFF, USE_ON, USE_SET, USE_TOGGLE };
-
+enum
+{
+	N1, N2, N3, N4, N5, N6, N7, N8, N9, N0
+};
+enum
+{
+	B1 = 1 << N1, B2 = 1 << N2, B3 = 1 << N3, B4 = 1 << N4, B5 = 1 << N5,
+	B6 = 1 << N6, B7 = 1 << N7, B8 = 1 << N8, B9 = 1 << N9, B0 = 1 << N0,
+};
 new const inventory_dir_name[] = "d2_origins";
 
 new mod_name[32] = "Diablo II: LOD";
