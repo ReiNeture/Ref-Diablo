@@ -10,20 +10,22 @@
 #include <cstrike>
 #include <fakemeta>
 #include <xs>
+#include <d2lod>
 
 #define fm_create_entity(%1) engfunc(EngFunc_CreateNamedEntity, engfunc(EngFunc_AllocString, %1))
 
+#define PLUGIN_NAME "綠汁雷射槍"
 #define VERSION "1.0"
 #define AUTHOR "Sh0oT3R"
 
-#define FIRERATE 0.1
+#define FIRERATE 0.2
 #define HITSD 0.7
-#define RELOADSPEED 5.0
+#define RELOADSPEED 4.5
 #define DAMAGE 250.0
 #define DAMAGE_MULTI 3.0
 
 #define CSW_WPN CSW_FAMAS
-new const weapon[] = "weapon_famas"
+new const weapon_names[] = "weapon_famas"
 
 new const spr_beam[] = "sprites/plasma/plasma_beam.spr"
 new const spr_exp[] = "sprites/plasma/plasma_exp.spr"
@@ -36,6 +38,23 @@ new bool:g_HasRifle[33]
 new g_iCurWpn[33], Float:g_flLastFireTime[33]
 new g_sprBeam, g_sprExp, g_sprBlood, g_msgDamage, g_msgScreenFade, g_msgScreenShake
 
+// D2
+new g_SkillId;
+new g_iCurSkill[33];
+new Float:g_LastPressedSkill[33];
+new Skill_Level = 5;
+new Skill_Allocate = 25;
+
+new const Float:PlasmaDamage[25] =  // 基礎傷害
+{
+	100.0, 120.0, 140.0, 160.0, 180.0, 200.0, 
+	220.0, 240.0, 260.0, 280.0, 300.0, 320.0, 
+	340.0, 360.0, 380.0, 400.0, 420.0, 440.0, 
+	460.0, 500.0, 500.0, 500.0, 500.0, 500.0,
+	500.0
+};
+new const NeedMana = 10;
+
 const m_pPlayer = 		41
 const m_fInReload =		54
 const m_pActiveItem = 		373
@@ -46,7 +65,7 @@ const m_flNextSecondaryAttack =	47
 
 const UNIT_SECOND =		(1<<12)
 const ENG_NULLENT = 		-1
-const WPN_MAXCLIP =		25
+const WPN_MAXCLIP =		100
 const ANIM_FIRE = 		5
 const ANIM_DRAW = 		10
 const ANIM_RELOAD =		9
@@ -55,7 +74,7 @@ const WPNKEY = 			2816
 
 public plugin_init() 
 {
-	register_plugin("[ZP] Extra Item: Plasma Rifle", VERSION, AUTHOR)
+	register_plugin(PLUGIN_NAME, VERSION, AUTHOR)
 	
 	register_event("HLTV", "Event_NewRound", "a", "1=0", "2=0");
 	register_event("CurWeapon", "event_CurWeapon", "b", "1=1")	
@@ -65,12 +84,12 @@ public plugin_init()
 	register_clcmd("getps", "extra_item_selected")
 
 	RegisterHam(Ham_Killed, "player", "fw_PlayerKilled")
-	RegisterHam(Ham_Item_Deploy, weapon, "fw_Deploy_Post", 1)
-	RegisterHam(Ham_Item_AddToPlayer, weapon, "fw_AddToPlayer")
-	RegisterHam(Ham_Weapon_Reload, weapon, "fw_Reload_Post", 1)
-	RegisterHam(Ham_Item_PostFrame, weapon, "fw_PostFrame")
+	RegisterHam(Ham_Item_Deploy, weapon_names, "fw_Deploy_Post", 1)
+	RegisterHam(Ham_Item_AddToPlayer, weapon_names, "fw_AddToPlayer")
+	RegisterHam(Ham_Weapon_Reload, weapon_names, "fw_Reload_Post", 1)
+	RegisterHam(Ham_Item_PostFrame, weapon_names, "fw_PostFrame")
 
-	
+	g_SkillId = register_d2_skill(PLUGIN_NAME, "獲得雷射槍.", ASSASSIN, Skill_Level, Skill_Allocate, DISPLAY)
 	g_msgDamage = get_user_msgid("Damage")
 	g_msgScreenFade = get_user_msgid("ScreenFade")
 	g_msgScreenShake = get_user_msgid("ScreenShake")
@@ -93,6 +112,37 @@ public plugin_precache()
 	for(i = 0; i < sizeof snd_reload; i++)
 		precache_sound(snd_reload[i])	
 }
+
+public d2_skill_selected(id, skill_id)
+{
+	g_iCurSkill[id] = skill_id;
+}
+public d2_skill_fired(id) {
+	if ( g_iCurSkill[id] == g_SkillId )
+	{
+		static Float:cdown; cdown = 1.5;
+		if (get_gametime() - g_LastPressedSkill[id] <= cdown) 
+		{
+			return PLUGIN_HANDLED;
+		}
+		else if ( get_gametime() - g_LastPressedSkill[id] >= cdown )
+		{
+			g_LastPressedSkill[id] = get_gametime()
+		}
+
+		if ( get_p_skill( id, g_SkillId ) > 0 && get_p_mana(id) >= NeedMana )
+		{
+			set_p_mana( id, get_p_mana(id) - NeedMana);
+			extra_item_selected(id);
+		} else {
+			client_print(id, print_center, "需要%d點能量", NeedMana);
+		}
+	}
+	return PLUGIN_CONTINUE;
+}
+
+public d2_takedamage(victim, attacker, Float:iDamage[1]) {}
+
 public event_CurWeapon(id)
 {
 	if(!is_user_alive(id))
@@ -117,12 +167,8 @@ public zp_user_infected_post(id)
 }
 public fw_PlayerKilled(victim, attacker, shouldgib)
 {
-	if(is_user_alive(victim))
-	{
-		g_HasRifle[victim] = false
-		return HAM_HANDLED
-	}
-	return HAM_IGNORED
+	g_HasRifle[victim] = false
+	return HAM_HANDLED
 }
 
 public Event_NewRound()
@@ -142,20 +188,13 @@ public client_disconnect(id)
 }
 public extra_item_selected(id)
 {
-	new bool:HasWpn = bool:user_has_weapon(id, CSW_WPN)
-	
-	if(!g_HasRifle[id] && !HasWpn)
-	{
-		g_HasRifle[id] = true	
-		fm_give_item(id, weapon)	
-		cs_set_user_bpammo(id, CSW_WPN, 100)	
-		engclient_cmd(id, weapon)
-	}
-	else
-	{
-		return PLUGIN_CONTINUE
-	}
-	return PLUGIN_CONTINUE
+	g_HasRifle[id] = true	
+	fm_give_item(id, weapon_names)	
+	cs_set_user_bpammo(id, CSW_WPN, 0)
+	new iWpnID = get_pdata_cbase(id, m_pActiveItem, 5)
+	cs_set_weapon_ammo(iWpnID, WPN_MAXCLIP)
+	engclient_cmd(id, weapon_names)
+	ExecuteHamB(Ham_Item_Deploy, iWpnID)
 }
 
 public fw_CmdStart(id, handle, seed)
@@ -182,9 +221,10 @@ public fw_CmdStart(id, handle, seed)
 		if(flCurTime - g_flLastFireTime[id] < FIRERATE)
 			return FMRES_IGNORED
 			
-		static iWpnID, iClip
+		static iWpnID, iClip, iBpAmmo
 		iWpnID = get_pdata_cbase(id, m_pActiveItem, 5)
 		iClip = cs_get_weapon_ammo(iWpnID)
+		iBpAmmo = cs_get_user_bpammo(id, CSW_WPN)
 		
 		if(get_pdata_int(iWpnID, m_fInReload, 4))
 			return FMRES_IGNORED
@@ -200,6 +240,12 @@ public fw_CmdStart(id, handle, seed)
 		}
 		primary_attack(id)
 		make_punch(id, 50)
+
+		if( iBpAmmo <= 0 && iClip <= 1 ) {
+			g_HasRifle[id] = false;
+			fm_strip_user_gun(id, CSW_FAMAS, weapon_names)
+			return FMRES_IGNORED
+		}
 		cs_set_weapon_ammo(iWpnID, --iClip)
 		
 		return FMRES_IGNORED
@@ -230,7 +276,6 @@ public fw_Deploy_Post(wpn)
 	{
 		set_wpnanim(id, ANIM_DRAW)
 	}
-	return HAM_IGNORED
 }
 public fw_AddToPlayer(wpn, id)
 {
@@ -302,11 +347,12 @@ public primary_attack(id)
 	entity_set_vector(id, EV_VEC_punchangle, Float:{ -1.5, 0.0, 0.0 })
 	emit_sound(id, CHAN_WEAPON, snd_fire[random_num(0, sizeof snd_fire - 1)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM)
 
-	static iTarget, iBody, iEndOrigin[3], iStartOrigin[3]
+	static iTarget, iBody, iEndOrigin[3], iStartOrigin[3], npcname[32]
 	get_user_origin(id, iStartOrigin, 1) 
 	get_user_origin(id, iEndOrigin, 3)
 	fire_effects(iStartOrigin, iEndOrigin)
 	get_user_aiming(id, iTarget, iBody)
+	pev(iTarget, pev_classname, npcname, sizeof(npcname));
 	
 	new iEnt = create_entity("info_target")
 	
@@ -315,7 +361,7 @@ public primary_attack(id)
 	entity_set_origin(iEnt, flOrigin)
 	remove_entity(iEnt)
 	
-	if(is_user_alive(iTarget))
+	if( is_user_alive(iTarget) && !IsPlayerNearByMonster(iTarget) && !is_p_protected(iTarget) && get_p_skill(id, g_SkillId) > 0 )
 	{	
 		if(HITSD > 0.0)
 		{
@@ -348,9 +394,10 @@ public primary_attack(id)
 			ExecuteHamB(Ham_Killed, iTarget, id, 2)
 		}
 	}
-	else
+	else if(!is_user_alive(iTarget) && equal(npcname, "func_wall") )
 	{
-		emit_sound(id, CHAN_WEAPON, snd_hit[random_num(0, sizeof snd_hit - 1)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM)
+		ExecuteHam(Ham_TakeDamage, iTarget, id, id, PlasmaDamage[get_p_skill(id, g_SkillId) - 1], DMG_BLAST);
+		// emit_sound(id, CHAN_WEAPON, snd_hit[random_num(0, sizeof snd_hit - 1)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM)
 	}
 }
 stock fire_effects(iStartOrigin[3], iEndOrigin[3])
@@ -478,6 +525,43 @@ stock fm_give_item(index, const item[])
 	engfunc(EngFunc_RemoveEntity, ent);
 	
 	return -1;
+}
+stock fm_find_ent_by_owner(index, const classname[], owner, jghgtype = 0) {
+	new strtype[11] = "classname", ent = index;
+	switch (jghgtype) {
+		case 1: strtype = "target";
+		case 2: strtype = "targetname";
+	}
+
+	while ((ent = engfunc(EngFunc_FindEntityByString, ent, strtype, classname)) && pev(ent, pev_owner) != owner) {}
+
+	return ent;
+}
+stock bool:fm_strip_user_gun(index, wid = 0, const wname[] = "") {
+	new ent_class[32];
+	if (!wid && wname[0])
+		copy(ent_class, sizeof ent_class - 1, wname);
+	else {
+		new weapon = wid, clip, ammo;
+		if (!weapon && !(weapon = get_user_weapon(index, clip, ammo)))
+			return false;
+		
+		get_weaponname(weapon, ent_class, sizeof ent_class - 1);
+	}
+
+	new ent_weap = fm_find_ent_by_owner(-1, ent_class, index);
+	if (!ent_weap)
+		return false;
+
+	engclient_cmd(index, "drop", ent_class);
+
+	new ent_box = pev(ent_weap, pev_owner);
+	if (!ent_box || ent_box == index)
+		return false;
+
+	dllfunc(DLLFunc_Think, ent_box);
+
+	return true;
 }
 
 /* AMXX-Studio Notes - DO NOT MODIFY BELOW HERE
