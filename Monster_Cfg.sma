@@ -89,7 +89,7 @@ public NameMenu_Handle(id, this, iNameItem)
 		case 18: g_szMonName = "leech"
 		case 19: g_szMonName = "scientist"
 		case 20: g_szMonName = "snark"
-		case 21: g_szMonName = "tencacle"
+		case 21: g_szMonName = "tentacle"
 		case 22: g_szMonName = "zombie"
 		case 23: g_szMonName = "gonome"
 		case 24: g_szMonName = "rat"
