@@ -420,6 +420,20 @@ public Fwd_Touch(ent, id)
 	return HAM_IGNORED;
 }
 
+// 清除掉落物
+public SetModel_Post(entity, const model[])
+{
+	if (!pev_valid(entity) ) return FMRES_IGNORED
+
+	new classname[32];
+	pev(entity, pev_classname, classname, charsmax(classname))
+
+	if (equal(classname, "weaponbox"))
+		set_pev(entity, pev_nextthink, get_gametime())
+
+	return FMRES_HANDLED
+} 
+
 // 刪除實體.
 public fwd_Remove_Ents(ent)
 {

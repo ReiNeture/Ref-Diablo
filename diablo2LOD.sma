@@ -77,6 +77,7 @@ public plugin_init()
 	register_forward(FM_CmdStart, "fwd_CmdStart");
 	register_forward(FM_GetGameDescription,	"fwd_GameDescription");
 	register_forward(FM_Touch, "Entity_Touched");
+	register_forward(FM_SetModel, "SetModel_Post", 1)
 
 	// 獲得/註冊訊息.
 	MsgSayText = get_user_msgid("SayText");
@@ -126,7 +127,7 @@ public plugin_init()
 	if( Count <= 1 )
 		g_iFakeplayer = -1;
 
-	set_task( 2.0, "AddFakeClient" );
+	// set_task( 2.0, "AddFakeClient" );
 
 	set_task( 1.0, "Spawn_Items");
 	set_task( 1.0, "Spawn_Items_Charsi")
@@ -217,7 +218,7 @@ public client_disconnect(id)
 	if( g_iFakeplayer == id ) 
 	{
 		g_iFakeplayer = 0;
-		set_task( 1.5, "AddFakeClient" );
+		// set_task( 1.5, "AddFakeClient" );
 	}
 
 	// 回覆模組.

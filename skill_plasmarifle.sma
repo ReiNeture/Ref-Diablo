@@ -12,6 +12,8 @@
 #include <xs>
 #include <d2lod>
 
+native get_wild_status(id);
+
 #define fm_create_entity(%1) engfunc(EngFunc_CreateNamedEntity, engfunc(EngFunc_AllocString, %1))
 
 #define PLUGIN_NAME "綠汁雷射槍"
@@ -19,6 +21,7 @@
 #define AUTHOR "Sh0oT3R"
 
 #define FIRERATE 0.2
+#define WILD_FIRERATE 0.1
 #define HITSD 0.7
 #define RELOADSPEED 4.5
 #define DAMAGE 250.0
@@ -65,7 +68,7 @@ const m_flNextSecondaryAttack =	47
 
 const UNIT_SECOND =		(1<<12)
 const ENG_NULLENT = 		-1
-const WPN_MAXCLIP =		100
+const WPN_MAXCLIP =		1000
 const ANIM_FIRE = 		5
 const ANIM_DRAW = 		10
 const ANIM_RELOAD =		9
@@ -118,6 +121,7 @@ public d2_skill_selected(id, skill_id)
 	g_iCurSkill[id] = skill_id;
 }
 public d2_skill_fired(id) {
+
 	if ( g_iCurSkill[id] == g_SkillId )
 	{
 		static Float:cdown; cdown = 1.5;
@@ -130,14 +134,20 @@ public d2_skill_fired(id) {
 			g_LastPressedSkill[id] = get_gametime()
 		}
 
+		if( user_has_weapon(id, CSW_WPN) ) {
+			client_print(id, print_center, "你已經拿著此武器了!");
+			return PLUGIN_HANDLED;
+		}
+
 		if ( get_p_skill( id, g_SkillId ) > 0 && get_p_mana(id) >= NeedMana )
 		{
 			set_p_mana( id, get_p_mana(id) - NeedMana);
 			extra_item_selected(id);
 		} else {
-			client_print(id, print_center, "需要%d點能量", NeedMana);
+			client_print(id, print_center, "需要 %d 點能量", NeedMana);
 		}
 	}
+
 	return PLUGIN_CONTINUE;
 }
 
@@ -218,7 +228,9 @@ public fw_CmdStart(id, handle, seed)
 		static Float:flCurTime
 		flCurTime = halflife_time()
 		
-		if(flCurTime - g_flLastFireTime[id] < FIRERATE)
+		new Float:FIRERATE_T = get_wild_status(id) ? WILD_FIRERATE : FIRERATE;
+
+		if(flCurTime - g_flLastFireTime[id] < FIRERATE_T)
 			return FMRES_IGNORED
 			
 		static iWpnID, iClip, iBpAmmo
@@ -229,9 +241,9 @@ public fw_CmdStart(id, handle, seed)
 		if(get_pdata_int(iWpnID, m_fInReload, 4))
 			return FMRES_IGNORED
 		
-		set_pdata_float(iWpnID, m_flNextPrimaryAttack, FIRERATE, 4)
-		set_pdata_float(iWpnID, m_flNextSecondaryAttack, FIRERATE, 4)
-		set_pdata_float(iWpnID, m_flTimeWeaponIdle, FIRERATE, 4)
+		set_pdata_float(iWpnID, m_flNextPrimaryAttack, FIRERATE_T, 4)
+		set_pdata_float(iWpnID, m_flNextSecondaryAttack, FIRERATE_T, 4)
+		set_pdata_float(iWpnID, m_flTimeWeaponIdle, FIRERATE_T, 4)
 		g_flLastFireTime[id] = flCurTime
 		if(iClip <= 0)
 		{
@@ -383,6 +395,12 @@ public primary_attack(id)
 			iDamage = DAMAGE*DAMAGE_MULTI
 			iBloodScale = 25
 		}
+
+		if( get_wild_status(id) )
+		{
+			iDamage *= 1.2;
+		}
+
 		if(iHp > iDamage) 
 		{
 			make_blood(iTarget, iBloodScale)
@@ -396,7 +414,11 @@ public primary_attack(id)
 	}
 	else if(!is_user_alive(iTarget) && equal(npcname, "func_wall") )
 	{
-		ExecuteHam(Ham_TakeDamage, iTarget, id, id, PlasmaDamage[get_p_skill(id, g_SkillId) - 1], DMG_BLAST);
+		if( get_wild_status(id) )
+			ExecuteHam(Ham_TakeDamage, iTarget, id, id, PlasmaDamage[get_p_skill(id, g_SkillId) - 1] * 1.2, DMG_BLAST);
+		else
+			ExecuteHam(Ham_TakeDamage, iTarget, id, id, PlasmaDamage[get_p_skill(id, g_SkillId) - 1], DMG_BLAST);
+
 		// emit_sound(id, CHAN_WEAPON, snd_hit[random_num(0, sizeof snd_hit - 1)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM)
 	}
 }
