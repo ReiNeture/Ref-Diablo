@@ -127,7 +127,7 @@ public plugin_init()
 	if( Count <= 1 )
 		g_iFakeplayer = -1;
 
-	// set_task( 2.0, "AddFakeClient" );
+	set_task( 2.0, "AddFakeClient" );
 
 	set_task( 1.0, "Spawn_Items");
 	set_task( 1.0, "Spawn_Items_Charsi")
@@ -170,6 +170,9 @@ public plugin_natives()
 	register_native("IsPlayerNearByMonster", "native_get_p_near_monster", 1);
 	register_native("drop_coins", "Native_Create_Coins");
 	register_native("get_p_magic", "native_get_p_magic", 1);
+	register_native("get_totaldmg_of_item", "get_totaldmg_of_item", 1);
+	register_native("get_p_bosspoint", "native_get_p_bosspoint", 1);
+	register_native("set_p_bosspoint", "Set_Player_Bosspoint", 1);
 }
 
 public client_connect(id)
@@ -218,7 +221,7 @@ public client_disconnect(id)
 	if( g_iFakeplayer == id ) 
 	{
 		g_iFakeplayer = 0;
-		// set_task( 1.5, "AddFakeClient" );
+		set_task( 1.5, "AddFakeClient" );
 	}
 
 	// 回覆模組.
@@ -390,6 +393,10 @@ public native_get_p_gold(id)
 public native_get_p_magic(id)
 {
 	return g_Energy[id][g_CurrentChar[id]];
+}
+public native_get_p_bosspoint(id)
+{
+	return g_Bosspoints[id][g_CurrentChar[id]];
 }
 public native_MAX_SKILLS_ACTIVE()
 {

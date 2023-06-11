@@ -18,9 +18,9 @@ new const g_SpriteExplode[] = "sprites/explosion1.spr";
 
 new const SorcaManaFireBall[30] =  // 發射火球需要的能量.
 {
-	5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 
-	14, 14, 15, 15, 15, 15, 16, 17, 18, 19,
-	20, 21, 22, 23, 24, 25, 26, 27, 28, 29
+	25,20,20,20,20,20,20,20,20,20,
+	20,20,20,20,20,20,20,20,20,20,
+	20,20,20,20,20,20,20,20,20,20
 };
 new const Float:FireBallDamage[30] =  // 術士的火球傷害.
 {
@@ -61,7 +61,7 @@ public d2_skill_fired(id)
 	if ( g_iCurSkill[id] == g_SkillId )
 	{
 		static Float:cdown;
-		cdown = 0.0;
+		cdown = 0.1;
 
 		if (get_gametime() - g_LastPressedSkill[id] <= cdown) 
 		{
@@ -118,7 +118,7 @@ public Entity_Touched(ent, victim)
 		write_byte(0); // 標記.
 		message_end();
 
-		Damage = FireBallDamage[get_p_skill(attacker, g_SkillId) - 1] + float(get_p_magic(attacker)) * 0.5;
+		Damage = FireBallDamage[get_p_skill(attacker, g_SkillId) - 1] + float(get_p_magic(attacker)) * 0.5 + get_totaldmg_of_item(attacker);
 		new monsterCount = 0;
 		new victim = FM_NULLENT;
 

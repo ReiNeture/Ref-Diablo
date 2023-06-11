@@ -12,8 +12,8 @@ Save_Data(id)
 
 	for(new hero_id = 0; hero_id < MAX_CHARS + 1 ; hero_id++)
 	{
-		iLen += formatex( szData[ iLen ], charsmax(szData) - iLen, "%d %d %d %d %d %d %d %d %d %d %d %d#", g_PlayerLevel[id][hero_id], g_PlayerXp[id][hero_id], g_PlayerSkPoints[id][hero_id], g_PlayerStPoints[id][hero_id], g_Strength[id][hero_id], g_Dexterity[id][hero_id], g_Vitality[id][hero_id], g_Energy[id][hero_id], 
-		g_Coins[id][hero_id], g_CoinsInv[id][hero_id], g_PlayerHero[id][hero_id], g_PlayerCharActive[id][hero_id] )
+		iLen += formatex( szData[ iLen ], charsmax(szData) - iLen, "%d %d %d %d %d %d %d %d %d %d %d %d %d#", g_PlayerLevel[id][hero_id], g_PlayerXp[id][hero_id], g_PlayerSkPoints[id][hero_id], g_PlayerStPoints[id][hero_id], g_Strength[id][hero_id], g_Dexterity[id][hero_id], g_Vitality[id][hero_id], g_Energy[id][hero_id], 
+		g_Coins[id][hero_id], g_CoinsInv[id][hero_id], g_Bosspoints[id][hero_id], g_PlayerHero[id][hero_id], g_PlayerCharActive[id][hero_id] )
 	}	
 	for( new iSkill = 0; iSkill <= g_skillcounter; iSkill++ ) 
 	{
@@ -64,7 +64,7 @@ Load_Data(id)
 
 	static szData[8000], szAllItems[8000], szData2[8000], szAllItems2[8000], szData3[8000], szAllItems3[8000];
 	new szClassLevel[512], szSkills[256], szItems[400], szPotions[400];
-	new szHero[126], szLevel[4], szXp[10], szSk[4], szSt[5], szCurMana[6], szStr[5], szDex[5], szVit[5], szEne[5], szCoin[10], szCoinInv[11],
+	new szHero[126], szLevel[4], szXp[10], szSk[4], szSt[5], szCurMana[6], szStr[5], szDex[5], szVit[5], szEne[5], szCoin[10], szCoinInv[11], szBosspoint[10], 
 	szPItem[3], szPItemInv[3], szPItemW[3], szPItemRep[5], szItemB[5], szPotion[4], szPotionInv[4], szPlayerChars[4],
 	szActive[2];
 	nvault_get(g_Nvault, szKey, szData, charsmax(szData) );
@@ -93,6 +93,7 @@ Load_Data(id)
 		strtok(szClassLevel, szEne, sizeof( szEne ) - 1, szClassLevel, sizeof( szClassLevel ) - 1, ' ')
 		strtok(szClassLevel, szCoin, sizeof( szCoin ) - 1, szClassLevel, sizeof( szClassLevel ) - 1, ' ')
 		strtok(szClassLevel, szCoinInv, sizeof( szCoinInv ) - 1, szClassLevel, sizeof( szClassLevel ) - 1, ' ')
+		strtok(szClassLevel, szBosspoint, sizeof( szBosspoint ) - 1, szClassLevel, sizeof( szClassLevel ) - 1, ' ')
 		strtok(szClassLevel, szHero, sizeof( szHero ) - 1, szActive, sizeof( szActive ) - 1, ' ')
 		
 		g_PlayerLevel[id][hero_id] = str_to_num( szLevel )
@@ -106,6 +107,7 @@ Load_Data(id)
 		g_Coins[id][hero_id] = str_to_num( szCoin )
 		g_CoinsInv[id][hero_id] = str_to_num( szCoinInv )
 		g_PlayerHero[id][hero_id] = str_to_num( szHero );
+		g_Bosspoints[id][hero_id] = str_to_num( szBosspoint );
 		g_PlayerCharActive[id][hero_id] = str_to_num( szActive );
 	}	
 	

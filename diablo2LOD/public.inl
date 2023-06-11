@@ -16,6 +16,7 @@ Reset_Data(id)
 		g_Energy[id][hero_id] = 0
 		g_Coins[id][hero_id] = 0
 		g_CoinsInv[id][hero_id] = 0
+		g_Bosspoints[id][hero_id] = 0
 	}	
 
 	g_PlayerChars[id] = 0;
@@ -154,6 +155,22 @@ public Set_Player_CoinsInv(id, value)
 		}
 	}
 }
+
+public Set_Player_Bosspoint(id, value)
+{
+	g_Bosspoints[id][g_CurrentChar[id]] = value
+
+	if ( g_Bosspoints[id][g_CurrentChar[id]] < 0 )
+	{
+		g_Bosspoints[id][g_CurrentChar[id]] = 0;
+	}
+
+	if( g_Bosspoints[id][g_CurrentChar[id]] > 1000000000 )
+	{
+		g_Coins[id][g_CurrentChar[id]] = 1000000000
+	}
+}
+
 public Set_Custom_Model(id)
 {
 	fm_set_user_model( id, Custom_Models[g_PlayerHero[id][g_CurrentChar[id]]] );
@@ -248,17 +265,16 @@ public HUD_Info_Task(id)
 	if ( is_user_alive(id) )
 	{
 		set_hudmessage(255, 255, 150, 0.02, 0.12, 0, 0.0, 0.3, 0.0, 0.0)
-		ShowSyncHudMsg(id, g_SyncHudCreate , "[職業: %s] [等級: %d] [經驗值: %d / %d]^n[能量: %d / %d]^n[血量: %d / %d]^n[錢: %d / %d]", HEROES[g_PlayerHero[id][g_CurrentChar[id]]], g_PlayerLevel[id][g_CurrentChar[id]],
+		ShowSyncHudMsg(id, g_SyncHudCreate , "[職業: %s] [等級: %d] [經驗值: %d / %d]^n[能量: %d / %d]^n[血量: %d / %d]^n[錢: %d / %d]^n[BP: %d]", HEROES[g_PlayerHero[id][g_CurrentChar[id]]], g_PlayerLevel[id][g_CurrentChar[id]],
 		g_PlayerXp[id][g_CurrentChar[id]], LEVELS[g_PlayerLevel[id][g_CurrentChar[id]]],  g_CurrentMana[id], HEROES_ENERGY_PERSTAT[g_PlayerHero[id][g_CurrentChar[id]]] * g_Energy[id][g_CurrentChar[id]], get_user_health(id), 
-		g_MaxHealth[id], 
-		g_Coins[id][g_CurrentChar[id]], MAX_PLAYER_MONEY[g_PlayerLevel[id][g_CurrentChar[id]]] )
+		g_MaxHealth[id], g_Coins[id][g_CurrentChar[id]], MAX_PLAYER_MONEY[g_PlayerLevel[id][g_CurrentChar[id]]], g_Bosspoints[id][g_CurrentChar[id]] )
 	}
 	else
 	{
 		set_hudmessage(255, 255, 150, 0.02, 0.12, 0, 0.0, 0.3, 0.0, 0.0)
-		ShowSyncHudMsg(id, g_SyncHudCreate , "[職業: %s] [等級: %d] [經驗值: %d / %d]^n[錢: %d / %d]", HEROES[g_PlayerHero[id][g_CurrentChar[id]]], g_PlayerLevel[id][g_CurrentChar[id]],
+		ShowSyncHudMsg(id, g_SyncHudCreate , "[職業: %s] [等級: %d] [經驗值: %d / %d]^n[錢: %d / %d]^n[BP: %d]", HEROES[g_PlayerHero[id][g_CurrentChar[id]]], g_PlayerLevel[id][g_CurrentChar[id]],
 		g_PlayerXp[id][g_CurrentChar[id]], LEVELS[g_PlayerLevel[id][g_CurrentChar[id]]], 
-		g_Coins[id][g_CurrentChar[id]], MAX_PLAYER_MONEY[g_PlayerLevel[id][g_CurrentChar[id]]] )
+		g_Coins[id][g_CurrentChar[id]], MAX_PLAYER_MONEY[g_PlayerLevel[id][g_CurrentChar[id]]], g_Bosspoints[id][g_CurrentChar[id]] )
 
 	}
 

@@ -12,17 +12,16 @@
 #include <xs>
 #include <d2lod>
 
-native get_wild_status(id);
-
 #define fm_create_entity(%1) engfunc(EngFunc_CreateNamedEntity, engfunc(EngFunc_AllocString, %1))
 
 #define PLUGIN_NAME "綠汁雷射槍"
+#define PLUGIN_NAME2 "武器強化"
 #define VERSION "1.0"
 #define AUTHOR "Sh0oT3R"
 
-#define FIRERATE 0.2
+#define FIRERATE 0.3
 #define WILD_FIRERATE 0.1
-#define HITSD 0.7
+#define HITSD 0.0
 #define RELOADSPEED 4.5
 #define DAMAGE 250.0
 #define DAMAGE_MULTI 3.0
@@ -41,22 +40,35 @@ new bool:g_HasRifle[33]
 new g_iCurWpn[33], Float:g_flLastFireTime[33]
 new g_sprBeam, g_sprExp, g_sprBlood, g_msgDamage, g_msgScreenFade, g_msgScreenShake
 
-// D2
-new g_SkillId;
+// Diablo 2 LOD 
+#define TASK_CODE 7777
+
+new g_SkillId, g_SkillId2;
 new g_iCurSkill[33];
 new Float:g_LastPressedSkill[33];
-new Skill_Level = 5;
-new Skill_Allocate = 25;
 
+new Skill_Level = 5;
+new Skill_Level_Wild = 55;
+new Skill_Allocate = 25;
+new Skill_Allocate_Wild = 20;
 new const Float:PlasmaDamage[25] =  // 基礎傷害
 {
-	100.0, 120.0, 140.0, 160.0, 180.0, 200.0, 
-	220.0, 240.0, 260.0, 280.0, 300.0, 320.0, 
-	340.0, 360.0, 380.0, 400.0, 420.0, 440.0, 
-	460.0, 500.0, 500.0, 500.0, 500.0, 500.0,
-	500.0
+	50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 
+	110.0, 120.0, 130.0, 140.0, 150.0, 160.0, 
+	170.0, 180.0, 190.0, 200.0, 210.0, 220.0, 
+	225.0, 230.0, 235.0, 240.0, 245.0, 250.0, 255.0
 };
-new const NeedMana = 10;
+new const BulletMana = 1;
+new const TakeOutMana = 50;
+
+new const WILD_ENABLE_MANA = 30;
+new bool:g_wild_enable[33];
+new const Float:WildUtilTime[MAX_P_SKILLS] = 
+{
+	1.0, 1.3, 1.6, 1.9, 2.2, 2.5, 2.8, 3.1, 3.4, 3.7, 
+	4.0, 4.3, 4.6, 4.9, 5.2, 5.5, 5.8, 6.1, 6.4, 7.0
+};
+
 
 const m_pPlayer = 		41
 const m_fInReload =		54
@@ -68,7 +80,8 @@ const m_flNextSecondaryAttack =	47
 
 const UNIT_SECOND =		(1<<12)
 const ENG_NULLENT = 		-1
-const WPN_MAXCLIP =		1000
+const WPN_MAXCLIP =		55
+const WPN_BPCLIP =		60000
 const ANIM_FIRE = 		5
 const ANIM_DRAW = 		10
 const ANIM_RELOAD =		9
@@ -92,7 +105,10 @@ public plugin_init()
 	RegisterHam(Ham_Weapon_Reload, weapon_names, "fw_Reload_Post", 1)
 	RegisterHam(Ham_Item_PostFrame, weapon_names, "fw_PostFrame")
 
+// Diablo 2 LOD 
 	g_SkillId = register_d2_skill(PLUGIN_NAME, "獲得雷射槍.", ASSASSIN, Skill_Level, Skill_Allocate, DISPLAY)
+	g_SkillId2 = register_d2_skill(PLUGIN_NAME2, "大幅提升綠汁雷射槍射速跟傷害.", ASSASSIN, Skill_Level_Wild, Skill_Allocate_Wild, DISPLAY)
+
 	g_msgDamage = get_user_msgid("Damage")
 	g_msgScreenFade = get_user_msgid("ScreenFade")
 	g_msgScreenShake = get_user_msgid("ScreenShake")
@@ -139,19 +155,58 @@ public d2_skill_fired(id) {
 			return PLUGIN_HANDLED;
 		}
 
-		if ( get_p_skill( id, g_SkillId ) > 0 && get_p_mana(id) >= NeedMana )
+		if ( get_p_skill( id, g_SkillId ) > 0 && get_p_mana(id) >= TakeOutMana )
 		{
-			set_p_mana( id, get_p_mana(id) - NeedMana);
+			set_p_mana( id, get_p_mana(id) - TakeOutMana);
 			extra_item_selected(id);
 		} else {
-			client_print(id, print_center, "需要 %d 點能量", NeedMana);
+			client_print(id, print_center, "需要 %d 點能量", TakeOutMana);
 		}
 	}
+
+	if ( g_iCurSkill[id] == g_SkillId2 )
+	{
+		const Float:cdown = 0.1;
+		if (get_gametime() - g_LastPressedSkill[id] <= cdown) 
+			return PLUGIN_HANDLED;
+		else if ( get_gametime() - g_LastPressedSkill[id] >= cdown )
+			g_LastPressedSkill[id] = get_gametime()
+
+		if( g_wild_enable[id] ) {
+			return PLUGIN_HANDLED;
+		}
+		if( get_p_mana(id) < WILD_ENABLE_MANA ) {
+			client_print(id, print_center, "能量不足%d點", WILD_ENABLE_MANA);
+			return PLUGIN_HANDLED;
+		}
+		if ( get_p_skill(id, g_SkillId2) < 1 )
+		{
+			client_print(id, print_center, "沒有學習此技能");
+			return PLUGIN_HANDLED;
+		}
+
+		g_wild_enable[id] = true;
+		set_p_mana(id, get_p_mana(id) - 10);
+		set_task(WildUtilTime[get_p_skill(id, g_SkillId2) - 1], "disable_wild", id + TASK_CODE)
+		client_print(id, print_center, "啟動:武器強化");
+	}	
 
 	return PLUGIN_CONTINUE;
 }
 
 public d2_takedamage(victim, attacker, Float:iDamage[1]) {}
+
+removeWildAndTask(id) {
+	if( task_exists(id + TASK_CODE) )
+		remove_task(id + TASK_CODE)
+	if( g_wild_enable[id] )
+		g_wild_enable[id] = false;
+}
+public disable_wild(id) {
+	id = id - TASK_CODE
+	if( g_wild_enable[id] )
+		g_wild_enable[id] = false;
+}
 
 public event_CurWeapon(id)
 {
@@ -177,8 +232,13 @@ public zp_user_infected_post(id)
 }
 public fw_PlayerKilled(victim, attacker, shouldgib)
 {
-	g_HasRifle[victim] = false
-	return HAM_HANDLED
+	if ( !is_user_connected(victim) ) 
+		return HAM_IGNORED;
+
+	g_HasRifle[victim] = false;
+	removeWildAndTask(victim);
+
+	return HAM_HANDLED;
 }
 
 public Event_NewRound()
@@ -191,18 +251,22 @@ public Event_NewRound()
 public client_putinserver(id)
 {
 	g_HasRifle[id] = false
+	removeWildAndTask(id)
 }
 public client_disconnect(id)
 {
 	g_HasRifle[id] = false
+	removeWildAndTask(id)
 }
 public extra_item_selected(id)
 {
 	g_HasRifle[id] = true	
 	fm_give_item(id, weapon_names)	
-	cs_set_user_bpammo(id, CSW_WPN, 0)
+
 	new iWpnID = get_pdata_cbase(id, m_pActiveItem, 5)
+	cs_set_user_bpammo(id, CSW_WPN, WPN_BPCLIP)
 	cs_set_weapon_ammo(iWpnID, WPN_MAXCLIP)
+
 	engclient_cmd(id, weapon_names)
 	ExecuteHamB(Ham_Item_Deploy, iWpnID)
 }
@@ -228,7 +292,7 @@ public fw_CmdStart(id, handle, seed)
 		static Float:flCurTime
 		flCurTime = halflife_time()
 		
-		new Float:FIRERATE_T = get_wild_status(id) ? WILD_FIRERATE : FIRERATE;
+		new Float:FIRERATE_T = g_wild_enable[id] ? WILD_FIRERATE : FIRERATE;
 
 		if(flCurTime - g_flLastFireTime[id] < FIRERATE_T)
 			return FMRES_IGNORED
@@ -245,20 +309,31 @@ public fw_CmdStart(id, handle, seed)
 		set_pdata_float(iWpnID, m_flNextSecondaryAttack, FIRERATE_T, 4)
 		set_pdata_float(iWpnID, m_flTimeWeaponIdle, FIRERATE_T, 4)
 		g_flLastFireTime[id] = flCurTime
+
 		if(iClip <= 0)
 		{
 			ExecuteHamB(Ham_Weapon_PlayEmptySound, iWpnID)
 			return FMRES_IGNORED
 		}
+		if(get_p_mana(id) < BulletMana)
+		{
+			ExecuteHamB(Ham_Weapon_PlayEmptySound, iWpnID)
+			client_print(id, print_center, "射擊需要 %d 點能量", BulletMana)
+			return FMRES_IGNORED
+		}
+
+		set_p_mana(id, get_p_mana(id) - BulletMana);
 		primary_attack(id)
-		make_punch(id, 50)
+		make_punch(id, 60)
 
 		if( iBpAmmo <= 0 && iClip <= 1 ) {
 			g_HasRifle[id] = false;
 			fm_strip_user_gun(id, CSW_FAMAS, weapon_names)
 			return FMRES_IGNORED
 		}
-		cs_set_weapon_ammo(iWpnID, --iClip)
+
+		if( !g_wild_enable[id] )
+			cs_set_weapon_ammo(iWpnID, --iClip)
 		
 		return FMRES_IGNORED
 	}
@@ -373,6 +448,13 @@ public primary_attack(id)
 	entity_set_origin(iEnt, flOrigin)
 	remove_entity(iEnt)
 	
+	new Float:iDamage = PlasmaDamage[get_p_skill(id, g_SkillId) - 1];
+	if( g_wild_enable[id] )
+	{
+		iDamage *= 1.2;
+	}
+	iDamage += get_totaldmg_of_item(id);
+
 	if( is_user_alive(iTarget) && !IsPlayerNearByMonster(iTarget) && !is_p_protected(iTarget) && get_p_skill(id, g_SkillId) > 0 )
 	{	
 		if(HITSD > 0.0)
@@ -382,23 +464,17 @@ public primary_attack(id)
 			xs_vec_mul_scalar(flVelocity, HITSD, flVelocity)
 			set_user_velocity(iTarget, flVelocity)	
 		}
-
 		new iHp = pev(iTarget, pev_health)
-		new Float:iDamage, iBloodScale
-		if(iBody == HIT_HEAD)
+		new iBloodScale
+
+		if(iBody != HIT_HEAD)
 		{
-			iDamage = DAMAGE
 			iBloodScale = 10
 		}
 		else
 		{
-			iDamage = DAMAGE*DAMAGE_MULTI
+			iDamage = iDamage * DAMAGE_MULTI
 			iBloodScale = 25
-		}
-
-		if( get_wild_status(id) )
-		{
-			iDamage *= 1.2;
 		}
 
 		if(iHp > iDamage) 
@@ -414,11 +490,7 @@ public primary_attack(id)
 	}
 	else if(!is_user_alive(iTarget) && equal(npcname, "func_wall") )
 	{
-		if( get_wild_status(id) )
-			ExecuteHam(Ham_TakeDamage, iTarget, id, id, PlasmaDamage[get_p_skill(id, g_SkillId) - 1] * 1.2, DMG_BLAST);
-		else
-			ExecuteHam(Ham_TakeDamage, iTarget, id, id, PlasmaDamage[get_p_skill(id, g_SkillId) - 1], DMG_BLAST);
-
+		ExecuteHam(Ham_TakeDamage, iTarget, id, id, iDamage, DMG_BLAST);
 		// emit_sound(id, CHAN_WEAPON, snd_hit[random_num(0, sizeof snd_hit - 1)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM)
 	}
 }

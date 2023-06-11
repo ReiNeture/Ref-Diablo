@@ -8,7 +8,7 @@ new PLUGIN_NAME[] = "Diablo II LOD 怪物補助插件"
 new PLUGIN_AUTHOR[] = "xbatista"
 new PLUGIN_VERSION[] = "1.0"
 
-#define MAX_MONSTERS 14
+#define MAX_MONSTERS 15
 
 #define COINS_CLASSNAME "CoinsMonster"
 
@@ -27,7 +27,8 @@ new const Monster_Models[MAX_MONSTERS][] =
 	"models/hgrunt.mdl",
 	"models/tentacle2.mdl",
 	"models/babygarg.mdl",
-	"models/bigrat.mdl"
+	"models/bigrat.mdl",
+	"models/gonome.mdl"
 }
 new const Monster_Xp[MAX_MONSTERS] =
 {
@@ -43,8 +44,9 @@ new const Monster_Xp[MAX_MONSTERS] =
 	2000,
 	0,
 	0,
+	10000,
 	0,
-	0
+	50000
 }
 new const Monster_Coins[MAX_MONSTERS] =
 {
@@ -59,17 +61,18 @@ new const Monster_Coins[MAX_MONSTERS] =
 	0,
 	15,
 	0,
+	100000,
+	500,
 	0,
-	0,
-	0
+	1024
 }
 new const Monster_Names[MAX_MONSTERS][] =
 {
 	"異型戰士",
-	"大媽 (王)",
+	"大媽",
 	"鱷魚",
 	"首腦",
-	"巨人 (王)",
+	"大藍",
 	"食腦蟲",
 	"百目狗",
 	"弗地崗人",
@@ -77,8 +80,28 @@ new const Monster_Names[MAX_MONSTERS][] =
 	"殭屍",
 	"人類戰士",
 	"鷹爪",
-	"小型巨人 (王)",
-	"老鼠"
+	"小灰",
+	"老鼠",
+	"殭屍王"
+}
+
+new const Monster_BossPoints[MAX_MONSTERS] =
+{
+	0,
+	100, // 大媽
+	20, // 鱷魚
+	0,
+	200, // 大藍
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	140, // 鷹爪
+	0,
+	0,
+	10 // 殭屍王
 }
 
 new g_iMaxPlayers;
@@ -119,6 +142,12 @@ public Monster_Killed(this, idattacker, shouldgib)
 				client_print( idattacker, print_center, "你殺了 %s, +%d經驗, +%d$", Monster_Names[monsters], Monster_Xp[monsters], Monster_Coins[monsters] + (get_p_level(idattacker)/4) );
 			}
 
+			if ( Monster_BossPoints[monsters] > 0 ) {
+				new names[32]; get_user_name(idattacker, names, charsmax(names))
+				set_p_bosspoint(idattacker, get_p_bosspoint(idattacker) + Monster_BossPoints[monsters]);
+				client_printcolor(0, "/ctr%s /g殺了 /ctr%s/g, 獲得 /y%d /gBossPoint", names, Monster_Names[monsters], Monster_BossPoints[monsters]);
+			}
+
 			// if ( Monster_Coins[monsters] > 0 )
 			// 	drop_coins( this, COINS_CLASSNAME, Monster_Coins[monsters] + (get_p_level(idattacker) / 4) );
 		}
@@ -136,13 +165,13 @@ public fw_Monster_PreThink(this, idattacker)
 	get_user_aiming(this, iTarget, iTemp)
 	entity_get_string(iTarget, EV_SZ_model, szMonsterModel, sizeof(szMonsterModel))
 	entity_get_string(iTarget, EV_SZ_classname, szClassname, sizeof(szClassname))
-	for(new i = 0;i < MAX_MONSTERS;i++)
+	for(new i = 0; i < MAX_MONSTERS; i++)
 	{
 		if(equal(szClassname, "func_wall"))
 		{
 			if(equal(szMonsterModel, Monster_Models[i]))
 			{
-				set_hudmessage(0, 191, 255, 0.10, 0.55, 0, 0.2, 0.4, 0.1, 0.1, 3)
+				set_hudmessage(0, 191, 255, 0.10, 0.55, 0, 0.2, 0.4, 0.1, 0.1, 4)
 				show_hudmessage(this, "怪物: %s^n血量: %d^n經驗: %d", Monster_Names[i], floatround(entity_get_float(iTarget, EV_FL_health)), Monster_Xp[i] )
 				break;
 			}

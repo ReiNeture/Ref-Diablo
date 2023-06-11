@@ -41,6 +41,7 @@ new g_iPlayerItemRepair[33][MAX_CHARS + 1][MAX_ITEMS];
 new g_iPlayerItemWorn[33][MAX_CHARS + 1][MAX_ITEMS];
 new g_iPlayerItemInv[33][MAX_CHARS + 1][MAX_ITEMS];
 new g_iPlayerItemBolts[33][MAX_CHARS + 1][MAX_ITEMS];
+new g_Bosspoints[33][MAX_CHARS + 1];
 
 new g_iSkills[33][MAX_CHARS + 1][MAX_PLUGIN_SKILLS];
 
