@@ -1,4 +1,5 @@
 #include <amxmodx>
+#include <fakemeta>
 
 new const PLUGIN[] = "怪物座標創造"
 new const VERSION[] = "3.0"
@@ -10,6 +11,8 @@ public plugin_init()
 {
 	register_plugin(PLUGIN, VERSION, AUTHOR)
 	register_clcmd("monster_cfg", "MonsterNameMenu")
+	register_clcmd("/noclip", "give_noclip")
+	register_clcmd("/godmode", "give_godmode")
 }
 
 public MonsterNameMenu(id)
@@ -428,4 +431,26 @@ public MakeMonsterConfigFile(id)
 	
 	set_hudmessage(75, 200, 200, -1.0, 0.86, 0, 6.0, 2.0, 0.1, 0.5, -1)
 	show_hudmessage(id,"檔案成功寫入%s!", FilePath)
+}
+
+public give_noclip(id)
+{
+	fm_set_user_noclip(id, 1)
+}
+
+public give_godmode(id)
+{
+	fm_set_user_godmode(id, 1)
+}
+
+stock fm_set_user_godmode(index, godmode = 0) {
+	set_pev(index, pev_takedamage, godmode == 1 ? DAMAGE_NO : DAMAGE_AIM);
+
+	return 1;
+}
+
+stock fm_set_user_noclip(index, noclip = 0) {
+	set_pev(index, pev_movetype, noclip == 1 ? MOVETYPE_NOCLIP : MOVETYPE_WALK);
+
+	return 1;
 }

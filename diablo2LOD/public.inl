@@ -49,6 +49,13 @@ Reset_Data(id)
 			g_iPlayerItemBolts[id][hero_id][item_id] = 0;
 		}
 	}
+	for(new drops = 0; drops < MAX_DROPS ; drops++)
+	{
+		for(new hero_id = 0; hero_id < MAX_CHARS + 1 ; hero_id++)
+		{
+			g_iPlayerDrops[id][hero_id][drops] = 0;
+		}
+	}
 }
 Reset_Data_Char(id, key)
 {
@@ -265,16 +272,16 @@ public HUD_Info_Task(id)
 	if ( is_user_alive(id) )
 	{
 		set_hudmessage(255, 255, 150, 0.02, 0.12, 0, 0.0, 0.3, 0.0, 0.0)
-		ShowSyncHudMsg(id, g_SyncHudCreate , "[職業: %s] [等級: %d] [經驗值: %d / %d]^n[能量: %d / %d]^n[血量: %d / %d]^n[錢: %d / %d]^n[BP: %d]", HEROES[g_PlayerHero[id][g_CurrentChar[id]]], g_PlayerLevel[id][g_CurrentChar[id]],
+		ShowSyncHudMsg(id, g_SyncHudCreate , "[職業: %s] [等級: %d] [經驗值: %d / %d]^n[能量: %d / %d]^n[血量: %d / %d]^n[錢: %d / %d]^n[BP: %d]^n[經驗倍率: %d]", HEROES[g_PlayerHero[id][g_CurrentChar[id]]], g_PlayerLevel[id][g_CurrentChar[id]],
 		g_PlayerXp[id][g_CurrentChar[id]], LEVELS[g_PlayerLevel[id][g_CurrentChar[id]]],  g_CurrentMana[id], HEROES_ENERGY_PERSTAT[g_PlayerHero[id][g_CurrentChar[id]]] * g_Energy[id][g_CurrentChar[id]], get_user_health(id), 
-		g_MaxHealth[id], g_Coins[id][g_CurrentChar[id]], MAX_PLAYER_MONEY[g_PlayerLevel[id][g_CurrentChar[id]]], g_Bosspoints[id][g_CurrentChar[id]] )
+		g_MaxHealth[id], g_Coins[id][g_CurrentChar[id]], MAX_PLAYER_MONEY[g_PlayerLevel[id][g_CurrentChar[id]]], g_Bosspoints[id][g_CurrentChar[id]], get_pcvar_num(d2_exp_scale) )
 	}
 	else
 	{
 		set_hudmessage(255, 255, 150, 0.02, 0.12, 0, 0.0, 0.3, 0.0, 0.0)
-		ShowSyncHudMsg(id, g_SyncHudCreate , "[職業: %s] [等級: %d] [經驗值: %d / %d]^n[錢: %d / %d]^n[BP: %d]", HEROES[g_PlayerHero[id][g_CurrentChar[id]]], g_PlayerLevel[id][g_CurrentChar[id]],
+		ShowSyncHudMsg(id, g_SyncHudCreate , "[職業: %s] [等級: %d] [經驗值: %d / %d]^n[錢: %d / %d]^n[BP: %d]^n[經驗倍率: %d]", HEROES[g_PlayerHero[id][g_CurrentChar[id]]], g_PlayerLevel[id][g_CurrentChar[id]],
 		g_PlayerXp[id][g_CurrentChar[id]], LEVELS[g_PlayerLevel[id][g_CurrentChar[id]]], 
-		g_Coins[id][g_CurrentChar[id]], MAX_PLAYER_MONEY[g_PlayerLevel[id][g_CurrentChar[id]]], g_Bosspoints[id][g_CurrentChar[id]] )
+		g_Coins[id][g_CurrentChar[id]], MAX_PLAYER_MONEY[g_PlayerLevel[id][g_CurrentChar[id]]], g_Bosspoints[id][g_CurrentChar[id]], get_pcvar_num(d2_exp_scale) )
 
 	}
 
@@ -452,4 +459,21 @@ public Set_Data_Kill(victim, attacker)
 	if ( g_iLogged[attacker] )
 		Set_Player_Xp(attacker, g_PlayerXp[attacker][g_CurrentChar[attacker]] + get_pcvar_num(d2_xp_kill) )
 
+}
+
+public give_player_item(id, item_id)
+{
+	g_iPlayerItem[id][g_CurrentChar[id]][item_id]++;
+
+	if ( item_data[item_id][CHAR_TYPE] == TYPE_BOLTS )
+	{
+		g_iPlayerItemBolts[id][g_CurrentChar[id]][item_id] = get_pcvar_num(d2_bolts_value);
+	}
+
+	if ( g_iPlayerItem[id][g_CurrentChar[id]][item_id] <= 1 )
+	{
+		g_iPlayerItemWorn[id][g_CurrentChar[id]][item_id] = ITEM_NOT_WORN;
+	}
+
+	g_iPlayerItemRepair[id][g_CurrentChar[id]][item_id] = item_data[item_id][CHAR_DURABILITY];
 }

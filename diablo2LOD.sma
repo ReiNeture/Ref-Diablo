@@ -7,6 +7,7 @@
 #include <engine>
 #include <nvault>
 #include <sqlx>
+#include <xs>
 
 #define VERSION	"1.9"
 
@@ -99,7 +100,13 @@ public plugin_init()
 	g_ActRangedShoot = CreateMultiForward("d2_ranged_actshoot", ET_IGNORE, FP_CELL, FP_CELL);
 	
 	gBuyCharacterMenu = B1 | B2 | B3 | B4 | B5 | B6 | B7 | B8 | B9 | B0;
+	gMakeItemMenu = B8;
 	register_menucmd(register_menuid("BuyChisatoMenu"), gBuyCharacterMenu, "buy_chisato_menu");
+	register_menucmd(register_menuid("ResetApspMenu"), gBuyCharacterMenu, "reset_apsp_menu");
+
+	register_menucmd(register_menuid("make_refknife_menu"), gMakeItemMenu, "make_refknife_menu");
+	register_menucmd(register_menuid("make_karambit_menu"), gMakeItemMenu, "make_karambit_menu");
+	register_menucmd(register_menuid("make_karambit_hardened_menu"), gMakeItemMenu, "make_karambit_hardened_menu");
 	
 	// 其他.
 	g_iMaxPlayers = get_maxplayers();
@@ -135,8 +142,12 @@ public plugin_init()
 	set_task( 1.0, "Spawn_Items_Miyu")
 
 	g_FakeEnt = create_entity( "info_target" );
+	register_clcmd("getr", "getr");
 }
+public getr(id)
+{
 
+}
 public plugin_natives()
 {
 	register_native("get_current_speed", "native_get_current_speed", 1);
@@ -173,6 +184,9 @@ public plugin_natives()
 	register_native("get_totaldmg_of_item", "get_totaldmg_of_item", 1);
 	register_native("get_p_bosspoint", "native_get_p_bosspoint", 1);
 	register_native("set_p_bosspoint", "Set_Player_Bosspoint", 1);
+	register_native("set_p_drops", "native_set_p_drops", 1);
+	register_native("get_p_drops", "native_get_p_drops", 1);
+	register_native("get_drops_name", "native_get_drops_name", 0);
 }
 
 public client_connect(id)
@@ -249,6 +263,7 @@ public plugin_precache()
 
 	engfunc(EngFunc_PrecacheSound, LevelUp);
 	engfunc(EngFunc_PrecacheSound, g_crossbow_shoot_sound);
+	engfunc(EngFunc_PrecacheSound, h_sound);
 
 	engfunc(EngFunc_PrecacheModel, "models/rpgrocket.mdl");
 
@@ -340,6 +355,7 @@ public plugin_cfg()
 	g_Nvault = nvault_open( "d2lod" );
 	g_Nvault2 = nvault_open( "d2lod2" );
 	g_Nvault3 = nvault_open( "d2lod3" );
+	g_Nvault4 = nvault_open( "d2lod4" );
 }
 
 public plugin_end()
@@ -348,6 +364,7 @@ public plugin_end()
 	nvault_close( g_Nvault );
 	nvault_close( g_Nvault2 );
 	nvault_close( g_Nvault3 );
+	nvault_close( g_Nvault4 );
 }
 
 public Float:native_get_current_speed(id)
@@ -398,6 +415,21 @@ public native_get_p_bosspoint(id)
 {
 	return g_Bosspoints[id][g_CurrentChar[id]];
 }
+public native_get_p_drops(id, drops_id)
+{
+	return g_iPlayerDrops[id][g_CurrentChar[id]][drops_id];
+}
+public native_set_p_drops(id, drops_id, value)
+{
+	if( -1 < drops_id < MAX_DROPS )
+		g_iPlayerDrops[id][g_CurrentChar[id]][drops_id] = value;
+}
+public native_get_drops_name(drops_id, szItems[], maxsize)
+{
+	param_convert(2);
+	formatex(szItems, maxsize, "%s", Drops_Name[drops_id]);
+}
+
 public native_MAX_SKILLS_ACTIVE()
 {
 	return g_skillcounter + 1;

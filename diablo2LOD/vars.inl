@@ -1,9 +1,9 @@
 // 所有新增的字元.
 
-new d2_xp_kill, d2_max_random_value, d2_stat_points_levelup, d2_high_level_xp, d2_high_level, d2_enable_respawn, d2_spawn_cooldown, d2_spawn_protection, d2_spawn_protection_time, d2_block_kill_command, d2_minlevel_coins, d2_minlevel_items, d2_chance_to_drop, d2_chance_to_dropp, d2_minlevel_potions, d2_show_damage, d2_show_damage_received, d2_3rdperson, d2_bolts_value, d2_advert, d2_advert_time, d2_save_type, d2_save_by, d2_block_attack2, d2_cl_corpsestay;
+new d2_xp_kill, d2_max_random_value, d2_stat_points_levelup, d2_high_level_xp, d2_high_level, d2_enable_respawn, d2_spawn_cooldown, d2_spawn_protection, d2_spawn_protection_time, d2_block_kill_command, d2_minlevel_coins, d2_minlevel_items, d2_chance_to_drop, d2_chance_to_dropp, d2_minlevel_potions, d2_show_damage, d2_show_damage_received, d2_3rdperson, d2_bolts_value, d2_advert, d2_advert_time, d2_save_type, d2_save_by, d2_block_attack2, d2_cl_corpsestay, d2_exp_scale;
 new mysqlx_host, mysqlx_user, mysqlx_db, mysqlx_pass;
 
-new g_Nvault, g_Nvault2, g_Nvault3;
+new g_Nvault, g_Nvault2, g_Nvault3, g_Nvault4;
 new Handle:g_DBTuple, Handle:g_DBConn;
 
 new MsgSayText;
@@ -42,6 +42,7 @@ new g_iPlayerItemWorn[33][MAX_CHARS + 1][MAX_ITEMS];
 new g_iPlayerItemInv[33][MAX_CHARS + 1][MAX_ITEMS];
 new g_iPlayerItemBolts[33][MAX_CHARS + 1][MAX_ITEMS];
 new g_Bosspoints[33][MAX_CHARS + 1];
+new g_iPlayerDrops[33][MAX_CHARS + 1][MAX_DROPS];
 
 new g_iSkills[33][MAX_CHARS + 1][MAX_PLUGIN_SKILLS];
 
@@ -72,6 +73,7 @@ new bool: g_FreezeTime;
 new g_charcounter = -1;
 new g_skillcounter = -1;
 new gBuyCharacterMenu;
+new gMakeItemMenu;
 
 new g_skillindex[MAX_HEROES][MAX_PLUGIN_SKILLS + 1];
 new g_skillhero[MAX_PLUGIN_SKILLS + 1];

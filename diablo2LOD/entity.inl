@@ -178,6 +178,7 @@ Create_Miyu(Origin[3])
 				
 		entity_set_int(akar_ent, EV_INT_solid, SOLID_BBOX)
 		entity_set_int(akar_ent, EV_INT_movetype, MOVETYPE_NONE)
+		entity_set_int(akar_ent, EV_INT_sequence, 1)
 		entity_set_edict(akar_ent, EV_ENT_owner, 0)
 
 		drop_to_floor(akar_ent)

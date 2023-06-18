@@ -130,3 +130,23 @@ public register_skill( skill_index, skill_name[], skill_desc[], skill_hero, skil
 
 	return g_skillcounter;
 }
+
+// ported from AMXX's core get_user_origin(..., 3) (suggested by Greenberet)
+stock fm_get_aim_origin(index, Float:origin[3]) {
+    new Float:start[3], Float:view_ofs[3];
+    pev(index, pev_origin, start);
+    pev(index, pev_view_ofs, view_ofs);
+    xs_vec_add(start, view_ofs, start);
+
+    new Float:dest[3];
+    pev(index, pev_v_angle, dest);
+    engfunc(EngFunc_MakeVectors, dest);
+    global_get(glb_v_forward, dest);
+    xs_vec_mul_scalar(dest, 9999.0, dest);
+    xs_vec_add(start, dest, dest);
+
+    engfunc(EngFunc_TraceLine, start, dest, 0, index, 0);
+    get_tr2(0, TR_vecEndPos, origin);
+
+    return 1;
+} 

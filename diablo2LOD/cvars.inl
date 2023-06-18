@@ -60,6 +60,8 @@ public LoadCvars()
 
 	d2_chance_to_dropp = register_cvar("d2_chance_drop_potion","15"); // 藥水掉落機率 ( 百分比 ).
 
+	d2_exp_scale = register_cvar("d2_exp_scale","15"); // 藥水掉落機率 ( 百分比 ).
+
 	register_clcmd("say /d2menu","main_mod_menu");
 	register_clcmd("say d2menu","main_mod_menu");
 

@@ -114,6 +114,9 @@ public hero_menu(id , menu , item)
 	
 	g_PlayerHero[id][Val] = key;
 	
+	g_Vitality[id][Val] = 10;
+	g_Energy[id][Val] = 10;
+
 	client_printcolor( id, "/y角色 /g%s /y以創造, 角色數量 : /ctr%d", HEROES[key], g_PlayerChars[id]);
 	
 	main_hero_menu_connect(id)
@@ -307,9 +310,10 @@ public main_misc_client_menu(id)
 	menu_additem(menu ,"使用藥水", "2" , 0); 
 	menu_additem(menu ,"交易道具", "3" , 0);
 	menu_additem(menu ,"給予道具", "4" , 0);
+	menu_additem(menu ,"其他物品", "5" , 0);
 	if ( get_user_flags(id) & ADMIN_RCON )
 	{
-		menu_additem(menu ,"管理員 : 創造NPC", "5" , 0);
+		menu_additem(menu ,"管理員 : 創造NPC", "6" , 0);
 	}
 
 	menu_setprop(menu , MPROP_EXIT , MEXIT_ALL);
@@ -347,6 +351,10 @@ public misc_client_menu(id , menu , item)
 			main_give_menu(id);
 		}
 		case 5:
+		{
+			main_drops_menu(id);
+		}
+		case 6:
 		{
 			Open_MapItemConfig(id);
 		}
@@ -517,7 +525,7 @@ public main_skill_menu(id)
 				g_skillname[g_PlayerHero[id][g_CurrentChar[id]]][skill_id], 
 				g_iSkills[id][g_CurrentChar[id]][skill_id], 
 				g_skillmax[skill_id], 
-				(g_skilldisplay[skill_id] ? "" : "\w[ \yPassive \w]\d" ), 
+				(g_skilldisplay[skill_id] ? "" : "\w[ \y被動 \w]\d" ), 
 				(g_PlayerLevel[id][g_CurrentChar[id]] < g_skilllevel[g_PlayerHero[id][g_CurrentChar[id]]][skill_id] ? "\r" : "\y"), 
 				g_skilllevel[g_PlayerHero[id][g_CurrentChar[id]]][skill_id] )
 
@@ -679,7 +687,7 @@ public map_item_menu(id , menu , item)
 			
 			new Origin[3]
 			get_user_origin(id, Origin, 3)
-			Origin[2] += 32
+			Origin[2] += 36
 			Create_Miyu(Origin)
 			Save_Origin_Miyu(MapName, Origin)
 			Load_Origins_Miyu(MapName)
@@ -728,6 +736,7 @@ public main_charsi_menu(id)
 	menu_additem(menu , "購買道具", "1" , 0); 
 	menu_additem(menu , "販賣道具", "2" , 0); 
 	menu_additem(menu , "修復道具", "3" , 0); 
+	menu_additem(menu , "道具資訊", "4" , 0); 
 
 	menu_setprop(menu , MPROP_EXIT , MEXIT_ALL);
 	menu_display(id , menu , 0); 
@@ -762,6 +771,10 @@ public charsi_menu(id , menu , item)
 		{
 			main_charsi_repair_menu(id);
 		}
+		case 4:
+		{
+			main_charsi_info_menu(id);
+		}
 	}
 
 	menu_destroy(menu); 
@@ -777,7 +790,8 @@ public main_charsi_buy_menu(id)
 
 	new szTempid[32];
 
-	for (new item_id = 0; item_id <= g_charcounter; item_id++)
+	const last_item = 12;
+	for (new item_id = 0; item_id <= last_item; item_id++)
 	{
 		num_to_str(item_id, szTempid, 31);
 
@@ -996,6 +1010,54 @@ public charsi_repair_menu(id , menu , item)
 	return PLUGIN_HANDLED;
 }
 
+public main_charsi_info_menu(id)
+{
+	new szInfo[60];
+	formatex(szInfo, 59, "選擇要查看的 \r道具資訊")
+
+	new menu = menu_create(szInfo , "charsi_info_menu");
+	new szTempid[32];
+
+	for (new item_id = 0; item_id <= g_charcounter; item_id++)
+	{
+		num_to_str(item_id, szTempid, 31);
+
+		new szItems[60];
+		formatex(szItems, 59, "%s", item_name[item_id])
+		menu_additem(menu, szItems, szTempid, 0);
+	}
+
+	menu_setprop(menu , MPROP_EXIT , MEXIT_ALL);
+	menu_display(id , menu , 0); 
+}
+public charsi_info_menu(id , menu , item) 
+{ 
+	if ( !native_get_p_near_charsi(id) )
+		return PLUGIN_HANDLED;
+
+	if(item == MENU_EXIT) 
+	{ 
+		menu_destroy(menu); 
+		return PLUGIN_HANDLED;
+	} 
+	new data[6], iName[64];
+	new access, callback;
+	menu_item_getinfo(menu, item, access, data,5, iName, 63, callback);
+
+	new item_id = str_to_num(data);
+
+	client_printcolor(id, "/y============== /ctr%s /y==============", item_name[item_id]);
+	client_printcolor(id, "/y編號:/g%d/y, 價格:/g%d$", item_id, item_data[item_id][CHAR_COST]);
+	client_printcolor(id, "/ctr裝備素質 /y傷害/g+%d/y, 防禦力/g+%d/y, 體力/g+%d/y, 能量/g+%d/y, 爆擊率/g+%d", 
+		item_data[item_id][CHAR_DAMAGE], item_data[item_id][CHAR_ARMOR], item_data[item_id][CHAR_GIVEVIT], 
+		item_data[item_id][CHAR_GIVEENE], item_data[item_id][CHAR_BLOCK]);
+	client_printcolor(id, "/ctr裝備需求 /y等級/g%d/y 力量/g%d/y 敏捷/g%d", item_data[item_id][CHAR_LEVEL], item_data[item_id][CHAR_STR], item_data[item_id][CHAR_DEX]);
+	
+	main_charsi_info_menu(id);
+	menu_destroy(menu); 
+	return PLUGIN_HANDLED;
+}
+
 // 藥水商人選單.
 public main_akara_menu(id)
 {
@@ -1172,9 +1234,13 @@ public akara_sell_menu(id , menu , item)
 public main_miyu_menu(id)
 {
 	new szInfo[60];
-	formatex(szInfo, 59, "角色數量 \d[ \y%d \d] - \r角色商人", g_PlayerChars[id])
+	formatex(szInfo, 59, "萬用商人", g_PlayerChars[id])
 	new menu = menu_create(szInfo , "miyu_menu");
-	menu_additem(menu , "購買錦木千束", "1" , 0); 
+	menu_additem(menu , "購買角色", "1" , 0);
+	menu_additem(menu , "製作道具", "2" , 0);
+	menu_additem(menu , "BP商店", "3" , 0);
+	menu_additem(menu , "重置能力值", "4" , 0);
+	menu_additem(menu , "和他瑟瑟", "5" , 0);
 
 	menu_setprop(menu , MPROP_EXIT , MEXIT_ALL);
 	menu_display(id , menu , 0); 
@@ -1195,6 +1261,306 @@ public miyu_menu(id , menu , item)
 
 	new key = str_to_num(data);
 	switch(key) {
+		case 1: main_buychar_menu(id);
+		case 2: main_maker_menu(id);
+		case 3: main_bpshop_menu(id);
+		case 4: main_reset_apsp_menu(id);
+		case 5: do_miyu_h(id);
+	}
+	menu_destroy(menu); 
+	return PLUGIN_HANDLED;
+}
+
+public main_maker_menu(id)
+{
+	// new szItems[60];
+	new menu = menu_create("要製作哪一件道具?" , "maker_menu");
+	menu_additem(menu, "爪刀", "1", 0);
+	menu_additem(menu, "表面硬化爪刀", "2", 0);
+	menu_additem(menu, "參考刀", "3", 0);
+
+	menu_setprop(menu , MPROP_EXIT , MEXIT_ALL);
+	menu_display(id , menu , 0); 
+}
+
+public maker_menu(id , menu , item) 
+{
+	new data[6], iName[64];
+	new access, callback;
+	menu_item_getinfo(menu, item, access, data,5, iName, 63, callback);
+
+	new key = str_to_num(data);
+	switch(key) {
+		case 1: main_make_karambit_menu(id);
+		case 2: main_make_karambithardened_menu(id);
+		case 3: main_make_refknife_menu(id);
+	}
+}
+
+public main_make_karambithardened_menu(id)
+{
+	new szMenu[256];
+	add(szMenu, sizeof(szMenu), "\y- 製作^n");
+	add(szMenu, sizeof(szMenu), "\r表面硬化爪刀 \yx1^n^n");
+
+	add(szMenu, sizeof(szMenu), "\y- 需要素材^n");
+	add(szMenu, sizeof(szMenu), "\w爪刀 \yx1 ^n");
+	add(szMenu, sizeof(szMenu), "\wA 血液 \yx100 ^n");
+	add(szMenu, sizeof(szMenu), "\w高階催化劑 \yx30 ^n^n");
+
+	add(szMenu, sizeof(szMenu), "\y8. \w製作^n");
+	add(szMenu, sizeof(szMenu), "\y0. \w取消");
+	show_menu(id, gBuyCharacterMenu, szMenu, -1, "make_karambit_hardened_menu");
+}
+
+public make_karambit_hardened_menu(id, num) 
+{
+	if( num == N8 )
+	{
+		if (!is_user_connected(id) || Get_Player_Items(id) >= MAX_PLAYER_ITEMS)
+		{
+			client_printcolor(id, "無法製作,道具數量達到最大限制!")
+			return PLUGIN_HANDLED;
+		}
+
+		const karambit_id = 11;
+		const karambit_hardened_id = 12;
+
+		if( g_iPlayerDrops[id][g_CurrentChar[id]][A_BOOLD] >= 100 && 
+			g_iPlayerDrops[id][g_CurrentChar[id]][CATALYST] >= 30 &&
+			g_iPlayerItem[id][g_CurrentChar[id]][karambit_id] >= 1 ) 
+		{
+			g_iPlayerDrops[id][g_CurrentChar[id]][A_BOOLD] -= 100;
+			g_iPlayerDrops[id][g_CurrentChar[id]][CATALYST] -= 30;
+
+			g_iPlayerItem[id][g_CurrentChar[id]][karambit_id]--;
+			if ( g_iPlayerItem[id][g_CurrentChar[id]][karambit_id] < 1 && g_iPlayerItemWorn[id][g_CurrentChar[id]][karambit_id] )
+			{
+				g_iPlayerItemWorn[id][g_CurrentChar[id]][karambit_id] = ITEM_NOT_WORN;
+				ExecuteForward( g_iItemTook, g_iReturn, id, karambit_id);
+			}
+
+			give_player_item(id, karambit_hardened_id)
+
+			new names[32];
+			get_user_name(id, names, 31)
+			client_printcolor(0, "/y%s/g製作了 /ctr表面硬化爪刀/y!", names)
+		}
+		else
+		{
+			client_printcolor(id, "/ctr製作/g所需的素材數量不足/y!")
+		}
+	}
+
+	return PLUGIN_CONTINUE;
+}
+
+public main_make_karambit_menu(id)
+{
+	new szMenu[256];
+	add(szMenu, sizeof(szMenu), "\y- 製作^n");
+	add(szMenu, sizeof(szMenu), "\r爪刀 \yx1^n^n");
+
+	add(szMenu, sizeof(szMenu), "\y- 需要素材^n");
+	add(szMenu, sizeof(szMenu), "\w鷹爪嘴巴 \yx1 ^n");
+	add(szMenu, sizeof(szMenu), "\w食腦蟲鱗片 \yx100 ^n");
+	add(szMenu, sizeof(szMenu), "\w綠色的皮 \yx20 ^n");
+	add(szMenu, sizeof(szMenu), "\w高階催化劑 \yx5 ^n^n");
+
+	add(szMenu, sizeof(szMenu), "\y8. \w製作^n");
+	add(szMenu, sizeof(szMenu), "\y0. \w取消");
+	show_menu(id, gBuyCharacterMenu, szMenu, -1, "make_karambit_menu");
+}
+
+public make_karambit_menu(id, num) 
+{
+	if( num == N8 )
+	{
+		if (!is_user_connected(id) || Get_Player_Items(id) >= MAX_PLAYER_ITEMS)
+		{
+			client_printcolor(id, "無法製作,道具數量達到最大限制!")
+			return PLUGIN_HANDLED;
+		}
+
+		if( g_iPlayerDrops[id][g_CurrentChar[id]][TENTACLE_MOUTH] >= 1 && 
+			g_iPlayerDrops[id][g_CurrentChar[id]][HEADCRAB_SCALES] >= 100 && 
+			g_iPlayerDrops[id][g_CurrentChar[id]][GREEN_LEATHER] >= 20 && 
+			g_iPlayerDrops[id][g_CurrentChar[id]][CATALYST] >= 5 ) 
+		{
+			g_iPlayerDrops[id][g_CurrentChar[id]][TENTACLE_MOUTH] -= 1;
+			g_iPlayerDrops[id][g_CurrentChar[id]][HEADCRAB_SCALES] -= 100;
+			g_iPlayerDrops[id][g_CurrentChar[id]][GREEN_LEATHER] -= 20;
+			g_iPlayerDrops[id][g_CurrentChar[id]][CATALYST] -= 5;
+
+			const item_id = 11;
+			give_player_item(id, item_id)
+			client_printcolor(id, "/y成功/g製作了 /ctr爪刀/y!")
+		}
+		else
+		{
+			client_printcolor(id, "/ctr製作/g所需的素材數量不足/y!")
+		}
+	}
+
+	return PLUGIN_CONTINUE;
+}
+
+public main_make_refknife_menu(id)
+{
+	new szMenu[256];
+	add(szMenu, sizeof(szMenu), "\y- 製作^n");
+	add(szMenu, sizeof(szMenu), "\r參考刀 \yx1^n^n");
+
+	add(szMenu, sizeof(szMenu), "\y- 需要素材^n");
+	add(szMenu, sizeof(szMenu), "\w學妹的內褲 \yx1 ^n");
+	add(szMenu, sizeof(szMenu), "\w高階催化劑 \yx1 ^n");
+	add(szMenu, sizeof(szMenu), "\w學長的內褲 \yx1 ^n");
+	add(szMenu, sizeof(szMenu), "\w金錢 \y100,000 ^n^n");
+
+	add(szMenu, sizeof(szMenu), "\y8. \w製作^n");
+	add(szMenu, sizeof(szMenu), "\y0. \w取消");
+	show_menu(id, gBuyCharacterMenu, szMenu, -1, "make_refknife_menu");
+}
+
+public make_refknife_menu(id, num) 
+{
+	if( num == N8 )
+	{
+		if (!is_user_connected(id) || Get_Player_Items(id) >= MAX_PLAYER_ITEMS)
+		{
+			client_printcolor(id, "無法製作,道具數量達到最大限制!")
+			return PLUGIN_HANDLED;
+		}
+
+		if( g_iPlayerDrops[id][g_CurrentChar[id]][TEMP_ITEM1] >= 1 && g_iPlayerDrops[id][g_CurrentChar[id]][CATALYST] >= 1 && 
+			g_iPlayerDrops[id][g_CurrentChar[id]][TEMP_ITEM2] >= 1 && g_Coins[id][g_CurrentChar[id]] >= 100000 ) 
+		{
+			g_iPlayerDrops[id][g_CurrentChar[id]][CATALYST]--;
+			g_iPlayerDrops[id][g_CurrentChar[id]][TEMP_ITEM1]--;
+			g_iPlayerDrops[id][g_CurrentChar[id]][TEMP_ITEM2]--;
+			Set_Player_Coins(id, g_Coins[id][g_CurrentChar[id]] - 100000)
+
+			const item_id = 10;
+			give_player_item(id, item_id)
+
+			new names[32];
+			get_user_name(id, names, 31)
+			client_printcolor(0, "/y%s /g製作了/ctr參考刀/y!", names)
+		}
+		else
+		{
+			client_printcolor(id, "/ctr製作/g所需的素材數量不足/y!")
+		}
+	}
+	return PLUGIN_CONTINUE;
+}
+
+public main_bpshop_menu(id)
+{
+	new menu = menu_create("\rBOSSPOINT商店 - \w選擇分類" , "bpshop_menu");
+	menu_additem(menu, "購買物品", "1", 0);
+	menu_additem(menu, "購買裝備", "2", 0);
+	menu_setprop(menu , MPROP_EXIT , MEXIT_ALL);
+	menu_display(id , menu , 0); 
+}
+
+public bpshop_menu(id , menu , item) 
+{ 
+	if ( !native_get_p_near_miyu(id) )
+		return PLUGIN_HANDLED;
+
+	new data[6], iName[64];
+	new access, callback;
+	menu_item_getinfo(menu, item, access, data,5, iName, 63, callback);
+
+	new key = str_to_num(data);
+	switch(key) 
+	{
+		case 1: main_bpshop_drops_menu(id);
+		// case 2: 
+	}
+
+	menu_destroy(menu); 
+	return PLUGIN_HANDLED;
+}
+
+public main_bpshop_drops_menu(id)
+{
+	new szTitle[60];
+	formatex(szTitle, 59, "\rBP 物品商店 \y- \w目前BP \d[ \y%d \d]", g_Bosspoints[id][g_CurrentChar[id]])
+	new menu = menu_create(szTitle , "bpshop_drops_menu");
+
+	new szTempid[16], szItems[60];
+	for (new i = 0; i < MAX_BPSHOP_DROPS; i++)
+	{
+		num_to_str(Bpshop_Drops_Id[i], szTempid, 31);
+		formatex(szItems, 59, "%s \d( \y%d \d)", Drops_Name[Bpshop_Drops_Id[i]], Bpshop_Drops_Cost[i])
+		menu_additem(menu, szItems, szTempid, 0);
+	}
+
+	menu_setprop(menu , MPROP_EXIT , MEXIT_ALL);
+	menu_display(id , menu , 0); 
+}
+
+public bpshop_drops_menu(id , menu , item) 
+{
+	if ( !native_get_p_near_miyu(id) )
+		return PLUGIN_HANDLED;
+
+	if(item == MENU_EXIT) 
+	{ 
+		menu_destroy(menu); 
+		return PLUGIN_HANDLED;
+	} 
+	new data[6], iName[64];
+	new access, callback;
+	menu_item_getinfo(menu, item, access, data,5, iName, 63, callback);
+
+	new item_id = str_to_num(data);
+	if( g_Bosspoints[id][g_CurrentChar[id]] >= Bpshop_Drops_Cost[item] )	
+	{
+		g_iPlayerDrops[id][g_CurrentChar[id]][item_id]++;
+		Set_Player_Bosspoint(id, g_Bosspoints[id][g_CurrentChar[id]] - Bpshop_Drops_Cost[item]);
+		client_printcolor(id, "/g已購買 /ctr%s /y!", Drops_Name[item_id]);
+	}
+	else
+	{
+		client_printcolor(id, "/ctr%s /y需要 /ctr%d /gBossPoint", Drops_Name[item_id], Bpshop_Drops_Cost[item]);
+	}
+
+	menu_destroy(menu);
+	main_bpshop_menu(id);
+
+	return PLUGIN_HANDLED;
+}
+
+public main_buychar_menu(id)
+{
+	new szInfo[60];
+	formatex(szInfo, 59, "角色數量 \d[ \y%d \d] - \r購買角色", g_PlayerChars[id])
+	new menu = menu_create(szInfo , "buychar_menu");
+	menu_additem(menu , "購買錦木千束", "1" , 0); 
+
+	menu_setprop(menu , MPROP_EXIT , MEXIT_ALL);
+	menu_display(id , menu , 0); 
+}
+public buychar_menu(id , menu , item) 
+{
+	if ( !native_get_p_near_miyu(id) )
+		return PLUGIN_HANDLED;
+
+	if(item == MENU_EXIT) 
+	{ 
+		menu_destroy(menu); 
+		return PLUGIN_HANDLED;
+	} 
+	new data[6], iName[64];
+	new access, callback;
+	menu_item_getinfo(menu, item, access, data,5, iName, 63, callback);
+
+	new key = str_to_num(data);
+	switch(key)
+	{
 		case 1: main_buy_chisato_menu(id);
 	}
 	menu_destroy(menu); 
@@ -1204,10 +1570,7 @@ public miyu_menu(id , menu , item)
 public main_buy_chisato_menu(id)
 {
 	new szMenu[256];
-	new szTitle[64];
-
-	format(szTitle, sizeof(szTitle), "\w確定購買 \r錦木千束 \w?^n");
-	add(szMenu, sizeof(szMenu), szTitle);
+	add(szMenu, sizeof(szMenu), "\w確定購買 \r錦木千束 \w?^n");
 	add(szMenu, sizeof(szMenu), "\w需要 \r100,000 \w金錢^n^n");
 	add(szMenu, sizeof(szMenu), "\y7. \w確定^n");
 	add(szMenu, sizeof(szMenu), "\y8. \w不要");
@@ -1217,20 +1580,20 @@ public main_buy_chisato_menu(id)
 public buy_chisato_menu(id, num) 
 {
 	switch(num) {
-		case N7: {
-
+		case N7:
+		{
 			if( g_Coins[id][g_CurrentChar[id]] < 100000 ) {
 				client_printcolor(id, "/y金錢不足! 你的錢:/g%d", g_Coins[id][g_CurrentChar[id]])
 				return;
 			}
-
+		/*
 			for(new i = 0; i <= MAX_CHARS; ++i) {
 				if( g_PlayerHero[id][i] == ASSASSIN && g_PlayerCharActive[id][i] ) {
 					client_printcolor(id, "/y你已經有這個角色了! 無法再購買")
 					return;
 				}
 			}
-			
+		*/
 			new Val;
 			g_PlayerChars[id]++;
 			for (new hero_id = 0; hero_id < g_PlayerChars[id]; hero_id++)
@@ -1238,9 +1601,70 @@ public buy_chisato_menu(id, num)
 				if ( !g_PlayerCharActive[id][hero_id] )
 					Val = hero_id;
 			}
+
 			g_PlayerCharActive[id][Val] = CHAR_ACTIVE;
 			g_PlayerHero[id][Val] = ASSASSIN;
+			g_Vitality[id][Val] = 10;
+			g_Energy[id][Val] = 10;
+			
+			Set_Player_Coins(id, g_Coins[id][g_CurrentChar[id]] - 100000);
 			client_printcolor( id, "/y角色 /g%s /y以創造, 角色數量 : /ctr%d", HEROES[ASSASSIN], g_PlayerChars[id]);
+		}
+	}
+}
+
+public main_reset_apsp_menu(id)
+{
+	new szMenu[256];
+	new szTitle[64];
+
+	format(szTitle, sizeof(szTitle), "\w確定重置你的\r技能點\w與\r能力點 \w?^n");
+	add(szMenu, sizeof(szMenu), szTitle);
+	add(szMenu, sizeof(szMenu), "\w需要 \r1,000 \w金錢^n^n");
+	add(szMenu, sizeof(szMenu), "\y7. \w確定^n");
+	add(szMenu, sizeof(szMenu), "\y8. \w不要");
+	show_menu(id, gBuyCharacterMenu, szMenu, -1, "ResetApspMenu");
+}
+
+public reset_apsp_menu(id, num) 
+{
+	switch(num) {
+		case N7:
+		{
+			if( g_Coins[id][g_CurrentChar[id]] < 1000 ) {
+				client_printcolor(id, "/y金錢不足! 你的錢:/g%d", g_Coins[id][g_CurrentChar[id]])
+				return;
+			}
+
+			// 重置能力點
+			g_Strength[id][g_CurrentChar[id]] = 0;
+			g_Dexterity[id][g_CurrentChar[id]] = 0;
+			g_Vitality[id][g_CurrentChar[id]] = 10;
+			g_Energy[id][g_CurrentChar[id]] = 10;
+
+			// 加回已穿裝備點數
+			for (new item_id = 0; item_id <= g_charcounter; item_id++)
+			{
+				if ( g_iPlayerItemWorn[id][g_CurrentChar[id]][item_id] )
+				{
+					Set_Player_Energy_Item(id, item_id);
+					Set_Player_Vitality_Item(id, item_id);
+				}
+			}
+			g_PlayerStPoints[id][g_CurrentChar[id]] = g_PlayerLevel[id][g_CurrentChar[id]] * get_pcvar_num(d2_stat_points_levelup);
+
+			// 重置技能點
+			for (new skill_id = 0; skill_id <= g_skillcounter; skill_id++)
+			{
+				if ( g_PlayerHero[id][g_CurrentChar[id]] == g_skillhero[skill_id] )
+				{
+					g_iSkills[id][g_CurrentChar[id]][skill_id] = 0;
+				}
+			}
+			g_PlayerSkPoints[id][g_CurrentChar[id]] = g_PlayerLevel[id][g_CurrentChar[id]];
+
+			Set_Player_Coins(id, g_Coins[id][g_CurrentChar[id]] - 1000);
+			client_printcolor(id, "/y已重置技能點與能力點");
 		}
 	}
 }
@@ -2299,6 +2723,55 @@ public trade_accept_menuT(target , menu , item)
 	}
 
 	menu_destroy(menu); 
+	return PLUGIN_HANDLED;
+}
+
+public main_drops_menu(id)
+{
+	if ( !g_iLogged[id] )
+		return;
+
+	new szTempid[16], szItems[60];
+
+	new menu = menu_create("其他物品", "drops_menu");
+	for (new drop_id = 0; drop_id < MAX_DROPS; drop_id++)
+	{
+		new drops_count = g_iPlayerDrops[id][g_CurrentChar[id]][drop_id];
+		if( drops_count > 0 )
+		{
+			formatex(szItems, 59, "%s \yx%d", Drops_Name[drop_id], drops_count);
+			num_to_str(drop_id, szTempid, 15);
+			menu_additem(menu, szItems, szTempid, 0);
+		}
+	}
+
+	if( menu_items(menu) < 1 ) {
+		client_printcolor(id, "/ctr你的背包完全是空的!");
+		return;
+	}
+
+	menu_setprop(menu , MPROP_EXIT , MEXIT_ALL);
+	menu_display(id , menu , 0); 
+}
+
+public drops_menu(id , menu , item)
+{
+	if(item == MENU_EXIT) 
+	{ 
+		menu_destroy(menu); 
+		return PLUGIN_HANDLED;
+	}
+
+	new data[6], iName[64];
+	new access, callback;
+	menu_item_getinfo(menu, item, access, data,5, iName, 63, callback);
+	new key = str_to_num(data);
+
+	client_print(id, print_chat, "%s - %d", Drops_Name[key], g_iPlayerDrops[id][g_CurrentChar[id]][key])
+
+	main_drops_menu(id);
+	menu_destroy(menu); 
+
 	return PLUGIN_HANDLED;
 }
 

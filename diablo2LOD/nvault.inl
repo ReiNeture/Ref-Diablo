@@ -55,6 +55,21 @@ Save_Data(id)
 	}
 	
 	nvault_set( g_Nvault3, szKey, szData );
+
+	iLen = 0;
+	szData = "";
+	
+	iLen += formatex( szData[ iLen ], charsmax(szData) - iLen, "#" );
+	
+	for( new iDrops = 0; iDrops < MAX_DROPS ; iDrops++ )
+	{
+		for(new hero_id = 0; hero_id < MAX_CHARS + 1 ; hero_id++)
+		{
+			iLen += formatex( szData[ iLen ], charsmax(szData) - iLen, "%d#", g_iPlayerDrops[id][hero_id][iDrops])
+		}
+	}
+	
+	nvault_set( g_Nvault4, szKey, szData );
 }
 
 Load_Data(id)
@@ -62,18 +77,20 @@ Load_Data(id)
 	new szKey[66];
 	Save_GetKey( id, szKey, charsmax( szKey ) );
 
-	static szData[8000], szAllItems[8000], szData2[8000], szAllItems2[8000], szData3[8000], szAllItems3[8000];
-	new szClassLevel[512], szSkills[256], szItems[400], szPotions[400];
+	static szData[8000], szAllItems[8000], szData2[8000], szAllItems2[8000], szData3[8000], szAllItems3[8000], szData4[8000], szAllItems4[8000];
+	new szClassLevel[512], szSkills[256], szItems[400], szPotions[400], szDrops[400];
 	new szHero[126], szLevel[4], szXp[10], szSk[4], szSt[5], szCurMana[6], szStr[5], szDex[5], szVit[5], szEne[5], szCoin[10], szCoinInv[11], szBosspoint[10], 
 	szPItem[3], szPItemInv[3], szPItemW[3], szPItemRep[5], szItemB[5], szPotion[4], szPotionInv[4], szPlayerChars[4],
 	szActive[2];
 	nvault_get(g_Nvault, szKey, szData, charsmax(szData) );
 	nvault_get(g_Nvault2, szKey, szData2, charsmax(szData2) );
 	nvault_get(g_Nvault3, szKey, szData3, charsmax(szData3) );
+	nvault_get(g_Nvault4, szKey, szData4, charsmax(szData4) );
 	
 	strtok(szData, szData, sizeof( szData ) - 1, szAllItems, sizeof( szAllItems ) - 1, '#')
 	strtok(szData2, szData2, sizeof( szData2 ) - 1, szAllItems2, sizeof( szAllItems2 ) - 1, '#')
 	strtok(szData3, szData3, sizeof( szData3 ) - 1, szAllItems3, sizeof( szAllItems3 ) - 1, '#')
+	strtok(szData4, szData4, sizeof( szData4 ) - 1, szAllItems4, sizeof( szAllItems4 ) - 1, '#')
 	
 	parse(szData, szPlayerChars, charsmax(szPlayerChars), szCurMana, charsmax(szCurMana) );
 
@@ -149,6 +166,14 @@ Load_Data(id)
 
 			g_iPlayerPotions[id][hero_id][iPotions] = str_to_num( szPotions )
 			g_iPlayerPotionsInv[id][hero_id][iPotions] = str_to_num( szPotionInv )
+		}	
+	}
+	for( new iDrops = 0; iDrops < MAX_DROPS ; iDrops++ )
+	{
+		for(new hero_id = 0; hero_id < MAX_CHARS + 1 ; hero_id++)
+		{
+			strtok(szAllItems4, szDrops, sizeof( szDrops ) - 1, szAllItems4, sizeof( szAllItems4 ) - 1, '#')
+			g_iPlayerDrops[id][hero_id][iDrops] = str_to_num( szDrops )
 		}	
 	}
 } 

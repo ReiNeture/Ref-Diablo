@@ -107,8 +107,8 @@ new const gTableCreateQuery[] =
 #define DISTANCE_INVENTORY_PLAYER 300.0
 #define DISTANCE_NEAR_MONSTER 300.0
 #define DISTANCE_E_BUTTON_USE_ENT 70.0
-#define MAX_PLAYER_ITEMS 7
-#define MAX_INVENTORY_ITEMS 7
+#define MAX_PLAYER_ITEMS 25
+#define MAX_INVENTORY_ITEMS 25
 #define MAX_PLAYER_POTIONS 10
 #define MAX_INVENTORY_POTIONS 10
 #define MAX_CHARS 15
@@ -148,8 +148,8 @@ const m_flWait = 42;
 [預緩存/下載檔案.]
 =================================================================================*/
 new const LevelUp[] = "d2lod/levelup.wav";
-
 new const g_crossbow_shoot_sound[] = "weapons/xbow_fire1.wav";
+new const h_sound[] = "ref/hh.wav";
 
 new const Custom_Models[MAX_HEROES][] = 
 {
@@ -255,6 +255,44 @@ new const Potion_Multi[MAX_POTIONS] = {
 [結束藥水設定.]
 =================================================================================*/
 
+#define MAX_DROPS 8
+
+enum { 
+	HEADCRAB_SCALES, 
+	GREEN_LEATHER, 
+	A_BOOLD, 
+	BLUE_CORE,
+	TENTACLE_MOUTH,
+	CATALYST,
+	TEMP_ITEM1,
+	TEMP_ITEM2
+};
+
+new const Drops_Name[MAX_DROPS][] = 
+{
+	"食腦蟲鱗片",
+	"綠色的皮",
+	"A 血液",
+	"藍色核心",
+	"鷹爪嘴巴",
+	"高階催化劑",
+	"學妹的內褲",
+	"學長的內褲"
+}
+
+#define MAX_BPSHOP_DROPS 3
+
+new const Bpshop_Drops_Id[MAX_BPSHOP_DROPS] = {
+	CATALYST,
+	TEMP_ITEM1,
+	TEMP_ITEM2
+}
+
+new const Bpshop_Drops_Cost[MAX_BPSHOP_DROPS] = {
+	650,
+	950,
+	1750
+}
 
 /*================================================================================
 [可編譯的數值.]
@@ -265,8 +303,8 @@ new const HEROES_DEFENCE_DEXTERITY[MAX_HEROES] = { 1, 2, 1, 1, 3, 2, 1 }; // 各
 
 new const Float: HEROES_STRENGTH_PERSTAT[MAX_HEROES] = { 0.6, 0.8, 0.5, 0.9, 0.7, 0.6, 0.5 }; // 各職業的1點力量增加多少傷害.
 new const HEROES_DEXTERITY_PERSTAT[MAX_HEROES] = { 3, 4, 2, 4, 3, 3, 2 }; // 各職業的1點敏捷增加多少迴避率.
-new const HEROES_VITALITY_PERSTAT[MAX_HEROES] = { 2, 2, 1, 3, 2, 3, 1 }; // 各職業的1點體力增加多少血量最大值.
-new const HEROES_ENERGY_PERSTAT[MAX_HEROES] = { 2, 2, 4, 1, 2, 3, 4 }; // 各職業的1點能量增加多少最大能量值.
+new const HEROES_VITALITY_PERSTAT[MAX_HEROES] = { 2, 2, 2, 2, 2, 2, 2 }; // 各職業的1點體力增加多少血量最大值.
+new const HEROES_ENERGY_PERSTAT[MAX_HEROES] = { 3, 3, 3, 3, 3, 3, 3 }; // 各職業的1點能量增加多少最大能量值.
 
 new const LEVELS[MAX_LEVELS] = { 
 100, 200, 300, 400, 700, 900, 1100, 1400, 1700, 2000,
