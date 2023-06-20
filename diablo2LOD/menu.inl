@@ -381,11 +381,30 @@ public main_hero_skill_menu(id)
 		if ( g_iSkills[id][g_CurrentChar[id]][skill_id] > 0 && g_PlayerHero[id][g_CurrentChar[id]] == g_skillhero[skill_id] && g_skilldisplay[skill_id] )
 		{
 			new szItems[60];
-			formatex(szItems, 59, "%s", g_skillname[g_PlayerHero[id][g_CurrentChar[id]]][skill_id])
+			formatex(szItems, 59, "%s", g_skillname[skill_id])
 
 			num_to_str(skill_id, szTempid, 31);
 
 			menu_additem(menu, szItems, szTempid, 0);
+		}
+	}
+
+	for (new item_id = 0; item_id <= g_charcounter; item_id++)
+	{
+		if ( g_iPlayerItemWorn[id][g_CurrentChar[id]][item_id] && g_iPlayerItem[id][g_CurrentChar[id]][item_id] > 0 && item_data[item_id][CHAR_SKILLSID] > 0 )
+		{
+			for (new skill_id = 0; skill_id <= g_skillcounter; skill_id++)
+			{
+				if( item_data[item_id][CHAR_SKILLSID] == g_skillhero[skill_id] )
+				{
+					new szItems[60];
+					formatex(szItems, 59, "%s", g_skillname[skill_id])
+
+					num_to_str(skill_id, szTempid, 31);
+
+					menu_additem(menu, szItems, szTempid, 0);
+				}
+			}
 		}
 	}
 
@@ -522,12 +541,12 @@ public main_skill_menu(id)
 		{
 			new szItems[90];
 			formatex(szItems, 89, "%s \d( \y%d/%d \d) %s - 需要等級 %s%d", 
-				g_skillname[g_PlayerHero[id][g_CurrentChar[id]]][skill_id], 
+				g_skillname[skill_id], 
 				g_iSkills[id][g_CurrentChar[id]][skill_id], 
 				g_skillmax[skill_id], 
 				(g_skilldisplay[skill_id] ? "" : "\w[ \y被動 \w]\d" ), 
-				(g_PlayerLevel[id][g_CurrentChar[id]] < g_skilllevel[g_PlayerHero[id][g_CurrentChar[id]]][skill_id] ? "\r" : "\y"), 
-				g_skilllevel[g_PlayerHero[id][g_CurrentChar[id]]][skill_id] )
+				(g_PlayerLevel[id][g_CurrentChar[id]] < g_skilllevel[skill_id] ? "\r" : "\y"), 
+				g_skilllevel[skill_id] )
 
 			num_to_str(skill_id, szTempid, 31);
 
@@ -554,9 +573,9 @@ public skill_menu(id , menu , item)
 	menu_item_getinfo(menu, item, access, data,5, iName, 63, callback);
 
 	new skill_id = str_to_num(data);
-	if ( g_PlayerLevel[id][g_CurrentChar[id]] < g_skilllevel[g_PlayerHero[id][g_CurrentChar[id]]][skill_id] )
+	if ( g_PlayerLevel[id][g_CurrentChar[id]] < g_skilllevel[skill_id] )
 	{
-		client_printcolor(id, "/y需要 /g%d 等", g_skilllevel[g_PlayerHero[id][g_CurrentChar[id]]][skill_id]);
+		client_printcolor(id, "/y需要 /g%d 等", g_skilllevel[skill_id]);
 
 		return PLUGIN_HANDLED;
 	}
@@ -791,7 +810,7 @@ public main_charsi_buy_menu(id)
 	new szTempid[32];
 
 	const last_item = 12;
-	for (new item_id = 0; item_id <= last_item; item_id++)
+	for (new item_id = 0; item_id <= g_charcounter; item_id++)
 	{
 		num_to_str(item_id, szTempid, 31);
 

@@ -118,13 +118,14 @@ public register_skill( skill_index, skill_name[], skill_desc[], skill_hero, skil
 	
 	g_skillcounter++;
 
-	g_skillindex[skill_hero][g_skillcounter] = skill_index;
+	// g_skillindex[skill_hero][g_skillcounter] = skill_index;
 
-	formatex( g_skillname[skill_hero][g_skillcounter], MAX_SKILL_NAME_SIZE, skill_name)
-	formatex( g_skilldesc[skill_hero][g_skillcounter], MAX_SKILL_DESC_SIZE, skill_desc)
+	formatex( g_skillname[g_skillcounter], MAX_SKILL_NAME_SIZE, skill_name)
+	formatex( g_skilldesc[g_skillcounter], MAX_SKILL_DESC_SIZE, skill_desc)
+	// formatex( g_skilldesc[skill_hero][g_skillcounter], MAX_SKILL_DESC_SIZE, skill_desc)
 
 	g_skillhero[g_skillcounter] = skill_hero;
-	g_skilllevel[skill_hero][g_skillcounter] = skill_level;
+	g_skilllevel[g_skillcounter] = skill_level;
 	g_skilldisplay[g_skillcounter] = skill_display;
 	g_skillmax[g_skillcounter] = skill_max;
 

@@ -31,7 +31,7 @@ new const Monster_Models[MAX_MONSTERS][] =
 	"models/gonome.mdl",
 	"models/apache.mdl",
 	"models/gonome_x.mdl",
-	"models/player/genshin_klee/genshin_klee.mdl"
+	"models/okasi_zombie.mdl"
 }
 new const Monster_Xp[MAX_MONSTERS] =
 {
@@ -94,7 +94,7 @@ new const Monster_Names[MAX_MONSTERS][] =
 	"殭屍王",
 	"阿帕契",
 	"變異殭屍王",
-	"可莉殭屍"
+	"#3 殭屍"
 }
 
 new const Monster_BossPoints[MAX_MONSTERS] =

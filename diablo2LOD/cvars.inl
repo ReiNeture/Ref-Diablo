@@ -250,6 +250,11 @@ public LoadIniItems()
 					// 儲存數值.
 					item_data[g_charcounter][CHAR_CROSSBOWDAMAGE] = str_to_num( value );
 				}
+				else if ( equali( key, "SKILLS_ID" ) )
+				{
+					// 儲存數值.
+					item_data[g_charcounter][CHAR_SKILLSID] = str_to_num( value );
+				}
 			}
 		}
 	}

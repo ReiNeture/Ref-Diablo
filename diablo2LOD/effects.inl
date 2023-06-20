@@ -8,7 +8,7 @@ public do_miyu_h(id)
         return PLUGIN_CONTINUE;
     }
 
-    new Float:Porigin[3], names[32];
+    new Float:Porigin[3];
     entity_get_vector( id, EV_VEC_origin, Porigin);
 
     new ent = -1

@@ -75,13 +75,18 @@ new g_skillcounter = -1;
 new gBuyCharacterMenu;
 new gMakeItemMenu;
 
-new g_skillindex[MAX_HEROES][MAX_PLUGIN_SKILLS + 1];
+// new g_skillindex[MAX_HEROES][MAX_PLUGIN_SKILLS + 1];
 new g_skillhero[MAX_PLUGIN_SKILLS + 1];
 new g_skilldisplay[MAX_PLUGIN_SKILLS + 1];
-new g_skilllevel[MAX_HEROES][MAX_PLUGIN_SKILLS + 1];
+
+new g_skilllevel[MAX_PLUGIN_SKILLS + 1];
+// new g_skilllevel[MAX_HEROES][MAX_PLUGIN_SKILLS + 1];
+
 new g_skillmax[MAX_PLUGIN_SKILLS + 1];
-new g_skillname[MAX_HEROES][MAX_PLUGIN_SKILLS + 1][MAX_SKILL_NAME_SIZE + 1];
-new g_skilldesc[MAX_HEROES][MAX_PLUGIN_SKILLS + 1][MAX_SKILL_DESC_SIZE + 1];
+new g_skillname[MAX_PLUGIN_SKILLS + 1][MAX_SKILL_NAME_SIZE + 1];
+
+new g_skilldesc[MAX_PLUGIN_SKILLS + 1][MAX_SKILL_DESC_SIZE + 1];
+// new g_skilldesc[MAX_HEROES][MAX_PLUGIN_SKILLS + 1][MAX_SKILL_DESC_SIZE + 1];
 
 new item_name[MAX_ITEMS][32];
 new item_pmodel[MAX_ITEMS][64];

@@ -44,7 +44,7 @@
 #define SHOOT_TIME 1
 
 // 角色資料.
-#define MAX_CHAR_DATA 16
+#define MAX_CHAR_DATA 17
 #define CHAR_ARMOR 0
 #define CHAR_DAMAGE 1
 #define CHAR_COST 2
@@ -60,6 +60,7 @@
 #define CHAR_PDAMAGE 12
 #define CHAR_PDURATION 13
 #define CHAR_CROSSBOWDAMAGE 15
+#define CHAR_SKILLSID 16
 
 // 裝備類型.
 #define TYPE_GLOVES 0

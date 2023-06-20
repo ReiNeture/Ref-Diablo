@@ -5,6 +5,8 @@
 #define _diablo2LOD_included
 
 #define MAX_P_SKILLS 20
+#define ITEM_NOT_WORN 0
+#define ITEM_WORN 1
 
 // 獲得最大技能數並且讀取.
 native MAX_SKILLS_ACTIVE();
@@ -50,6 +52,12 @@ enum
 	TYPE_RING,
 	TYPE_AMULET,
 	TYPE_BOLTS
+}
+
+// 道具技能.
+enum Item_Skills
+{
+	SHOCKWAVE_RING = 80001
 }
 
 // 按E後呼叫這個Forward.
