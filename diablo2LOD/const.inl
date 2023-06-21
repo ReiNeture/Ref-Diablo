@@ -156,7 +156,7 @@ new const Custom_Models[MAX_HEROES][] =
 {
 	"genshin_klee",
 	"chisato",
-	"black_knight",
+	"GrassWonder",
 	"black_knight",
 	"black_knight",
 	"black_knight",
@@ -191,7 +191,7 @@ new const HEROES[MAX_HEROES][] =
 {
     "可莉",
     "錦木千束",
-    "法師",
+    "草上飛",
     "野蠻人",
     "聖劍士",
     "德魯伊",

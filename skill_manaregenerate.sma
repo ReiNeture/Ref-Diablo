@@ -55,7 +55,7 @@ public fwd_PreThink(id)
 	if ( !is_user_alive(id) )
 		return FMRES_IGNORED;
 
-	const Float:cdown = 0.5;
+	const Float:cdown = 0.1;
 
 	static Float:g_LastPressedSkill[33];
 	if (get_gametime() - g_LastPressedSkill[id] <= cdown) 

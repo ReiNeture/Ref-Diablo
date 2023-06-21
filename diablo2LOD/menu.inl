@@ -1558,7 +1558,8 @@ public main_buychar_menu(id)
 	new szInfo[60];
 	formatex(szInfo, 59, "角色數量 \d[ \y%d \d] - \r購買角色", g_PlayerChars[id])
 	new menu = menu_create(szInfo , "buychar_menu");
-	menu_additem(menu , "購買錦木千束", "1" , 0); 
+	menu_additem(menu , "購買 錦木千束", "1" , 0);
+	menu_additem(menu , "購買 草上飛", "2" , 0);
 
 	menu_setprop(menu , MPROP_EXIT , MEXIT_ALL);
 	menu_display(id , menu , 0); 
@@ -1581,19 +1582,61 @@ public buychar_menu(id , menu , item)
 	switch(key)
 	{
 		case 1: main_buy_chisato_menu(id);
+		case 2: main_buy_grasswonder_menu(id);
 	}
 	menu_destroy(menu); 
 	return PLUGIN_HANDLED;
 }
 
+public main_buy_grasswonder_menu(id)
+{
+	new szMenu[256], szItem[64];
+	formatex(szItem, 63, "\w確定購買 \r%s \w?^n", HEROES[NECROMANCER]);
+
+	add(szMenu, sizeof(szMenu), szItem);
+	add(szMenu, sizeof(szMenu), "\w需要 \r2000 \wBossPoint^n^n");
+	add(szMenu, sizeof(szMenu), "\y7. \w確定^n");
+	add(szMenu, sizeof(szMenu), "\y8. \w不要");
+	show_menu(id, gBuyCharacterMenu, szMenu, -1, "buy_grasswonder_menu");
+}
+
+public buy_grasswonder_menu(id, num) 
+{
+	if( num == N7 )
+	{
+		if( g_Bosspoints[id][g_CurrentChar[id]] < 2000 ) {
+			client_printcolor(id, "/g購買條件不足/y!");
+			return;
+		}
+		
+		new Val;
+		g_PlayerChars[id]++;
+		for (new hero_id = 0; hero_id < g_PlayerChars[id]; hero_id++)
+		{
+			if ( !g_PlayerCharActive[id][hero_id] )
+				Val = hero_id;
+		}
+
+		g_PlayerCharActive[id][Val] = CHAR_ACTIVE;
+		g_PlayerHero[id][Val] = NECROMANCER;
+		g_Vitality[id][Val] = 10;
+		g_Energy[id][Val] = 10;
+		
+		g_Bosspoints[id][g_CurrentChar[id]] -= 2000;
+		client_printcolor( id, "/y角色 /g%s /y以創造, 角色數量 : /ctr%d", HEROES[NECROMANCER], g_PlayerChars[id]);
+	}	
+}
+
 public main_buy_chisato_menu(id)
 {
-	new szMenu[256];
-	add(szMenu, sizeof(szMenu), "\w確定購買 \r錦木千束 \w?^n");
+	new szMenu[256], szItem[64];
+	formatex(szItem, 63, "\w確定購買 \r%s \w?^n", HEROES[ASSASSIN]);
+
+	add(szMenu, sizeof(szMenu), szItem);
 	add(szMenu, sizeof(szMenu), "\w需要 \r100,000 \w金錢^n^n");
 	add(szMenu, sizeof(szMenu), "\y7. \w確定^n");
 	add(szMenu, sizeof(szMenu), "\y8. \w不要");
-	show_menu(id, gBuyCharacterMenu, szMenu, -1, "BuyChisatoMenu");
+	show_menu(id, gBuyCharacterMenu, szMenu, -1, "buy_chisato_menu");
 }
 
 public buy_chisato_menu(id, num) 
@@ -1602,7 +1645,7 @@ public buy_chisato_menu(id, num)
 		case N7:
 		{
 			if( g_Coins[id][g_CurrentChar[id]] < 100000 ) {
-				client_printcolor(id, "/y金錢不足! 你的錢:/g%d", g_Coins[id][g_CurrentChar[id]])
+				client_printcolor(id, "/g購買條件不足/y!");
 				return;
 			}
 		/*

@@ -101,7 +101,8 @@ public plugin_init()
 	
 	gBuyCharacterMenu = B1 | B2 | B3 | B4 | B5 | B6 | B7 | B8 | B9 | B0;
 	gMakeItemMenu = B8;
-	register_menucmd(register_menuid("BuyChisatoMenu"), gBuyCharacterMenu, "buy_chisato_menu");
+	register_menucmd(register_menuid("buy_chisato_menu"), gBuyCharacterMenu, "buy_chisato_menu");
+	register_menucmd(register_menuid("buy_grasswonder_menu"), gBuyCharacterMenu, "buy_grasswonder_menu");
 	register_menucmd(register_menuid("ResetApspMenu"), gBuyCharacterMenu, "reset_apsp_menu");
 
 	register_menucmd(register_menuid("make_refknife_menu"), gMakeItemMenu, "make_refknife_menu");

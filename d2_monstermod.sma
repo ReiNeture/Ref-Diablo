@@ -152,13 +152,13 @@ new d2_exp_scale;
 
 public plugin_init() 
 {
-	register_plugin(PLUGIN_NAME, PLUGIN_VERSION, PLUGIN_AUTHOR)
-	d2_exp_scale = register_cvar("d2_exp_scale", "1")
+	register_plugin(PLUGIN_NAME, PLUGIN_VERSION, PLUGIN_AUTHOR);
+	d2_exp_scale = register_cvar("d2_exp_scale", "1");
 
 	RegisterHam(Ham_Killed, "func_wall", "Monster_Killed");
-	RegisterHam(Ham_Player_PreThink, "player", "fw_Monster_PreThink")
+	RegisterHam(Ham_Player_PreThink, "player", "fw_Monster_PreThink");
 
-	register_touch( COINS_CLASSNAME, "player", "Coins_Pickup")
+	register_touch( COINS_CLASSNAME, "player", "Coins_Pickup");
 	register_logevent("Event_Round_End", 2, "1=Round_End");
 
 	g_iMaxPlayers = get_maxplayers();
