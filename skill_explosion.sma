@@ -112,14 +112,14 @@ public fw_Think(ent)
 	new npcname[32];
 	new id = pev(ent, pev_owner);
 	new victim = FM_NULLENT;
-	new Float:fDamage = ExplosionDamage[get_p_skill(id, g_SkillId) - 1] + get_totaldmg_of_item(id);
+	new Float:fDamage = ExplosionDamage[get_p_skill(id, g_SkillId) - 1] + float(get_p_magic(id)) * 10.0 + get_totaldmg_of_item(id);
 
 	while( (victim = engfunc(EngFunc_FindEntityInSphere, victim, fOrigin, RADIUS_DAMAGE) ) != 0 ) { // 火流星爆炸範圍
 		
 		pev(victim, pev_classname, npcname, sizeof(npcname));
 		if( is_user_alive(victim) && id != victim && !IsPlayerNearByMonster(victim) && !is_p_protected(victim) && get_p_skill(id, g_SkillId) > 0 )
 		{
-			dmg_kill_player(victim, id, fDamage, "skill_explosion");
+			// dmg_kill_player(victim, id, fDamage, "skill_explosion");
 		}
 		else if( !is_user_alive(victim) && equal(npcname, "func_wall") )
 		{

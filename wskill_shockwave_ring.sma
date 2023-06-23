@@ -18,7 +18,7 @@ new gShockwaveSpr;
 public plugin_init() 
 {
 	register_plugin(PLUGIN_NAME, PLUGIN_VERSION, PLUGIN_AUTHOR);
-	g_SkillId = register_d2_skill(PLUGIN_NAME, "發出衝擊波擊退周邊的人.", SHOCKWAVE_RING, 0, 0, DISPLAY);
+	g_SkillId = register_d2_skill(PLUGIN_NAME, "發出衝擊波擊退周邊的人.", SHOCKWAVE_RING, 1, 1, DISPLAY);
 }
 
 public plugin_precache()

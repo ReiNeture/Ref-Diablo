@@ -164,6 +164,7 @@ native bool:IsPlayerNearByMonster(id);
 
 // 取得角色魔力點數
 native get_p_magic(id);
+native get_p_strength(id);
 
 // 取得裝備傷害加總
 native Float:get_totaldmg_of_item(id);

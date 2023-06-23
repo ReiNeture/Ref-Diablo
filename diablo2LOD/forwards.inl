@@ -489,6 +489,17 @@ public D2_Item_Gone(id, item_id)
 		g_Energy[id][g_CurrentChar[id]] -= item_data[item_id][CHAR_GIVEENE];
 	}
 
+	if( item_data[item_id][CHAR_SKILLSID] > 0  )
+	{
+		for (new skill_id = 0; skill_id <= g_skillcounter; skill_id++)
+		{
+			if ( g_skillhero[skill_id] == item_data[item_id][CHAR_SKILLSID] )
+			{
+				g_iSkills[id][g_CurrentChar[id]][skill_id]--;
+			}
+		}
+	}
+
 }
 public d2_skill_takedamage(victim, attacker, Float:iDamage[1])
 {

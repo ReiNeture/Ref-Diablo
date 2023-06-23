@@ -20,6 +20,8 @@ const Skill_Req_Level = 33;
 const Skill_Max = 1;
 new g_SkillId;
 
+new count[33];
+const Float:basic_damge = 300.0;
 
 public plugin_init() 
 {
@@ -29,7 +31,7 @@ public plugin_init()
 	register_forward(FM_Touch, "fw_Touch")
 	register_forward(FM_Think, "fw_Think");
 
-	g_SkillId = register_d2_skill(PLUGIN_NAME, "追蹤劍法.", AMAZON, Skill_Req_Level, Skill_Max, NOT_DISPLAY);
+	g_SkillId = register_d2_skill(PLUGIN_NAME, "輕砍十下在背後召喚劍陣追蹤敵人.", NECROMANCER, Skill_Req_Level, Skill_Max, NOT_DISPLAY);
 }
 
 public plugin_precache()
@@ -46,8 +48,10 @@ public fw_Weapon_PrimaryAttack(ent)
 	if ( !is_user_connected(id) )
 		return HAM_IGNORED;
 
-	if( get_p_skill( id, g_SkillId ) > 0 )
+	count[id]++;
+	if( get_p_skill( id, g_SkillId ) > 0 && count[id] >= 10 )
 	{
+		count[id] = 0;
 		create_sword_missile(id);
 	}
 
@@ -57,7 +61,7 @@ public fw_Weapon_PrimaryAttack(ent)
 create_sword_missile(id)
 {
 	new Float:origin[3], Float:velocity[3], Float:offorigin[3], Float:angles[3];
-	for( new i = -3, j = 0; i <= 3; i++, j++ )
+	for( new i = 0; i < 5; i++ )
 	{
 		new sword_missile = engfunc(EngFunc_CreateNamedEntity, engfunc(EngFunc_AllocString, "info_target") )
 		set_pev(sword_missile, pev_classname, "sword_missile");
@@ -74,21 +78,29 @@ create_sword_missile(id)
 		set_pev(sword_missile, pev_angles, {90.0, 0.0, 0.0});
 
 		pev(id, pev_origin, origin);
-		getOffsetsVelocity(id, float(i * 40), velocity);
+		switch(i)
+		{
+			case 0: getOffsetsVelocity(id, 100.0, velocity, -70.0);
+			case 1: getOffsetsVelocity(id, 50.0, velocity, -80.0);
+			case 2: getOffsetsVelocity(id, 0.0, velocity, 0.0);
+			case 3: getOffsetsVelocity(id, 50.0, velocity, 80.0);
+			case 4: getOffsetsVelocity(id, 100.0, velocity, 70.0);
+		}
+		
 		xs_vec_add(origin, velocity, offorigin);
 		offorigin[2] += 64.0;
 		set_pev(sword_missile, pev_origin, offorigin);
 
-		set_pev(sword_missile, pev_nextthink, get_gametime() + 2.0 + float(j) * 0.1);
+		set_pev(sword_missile, pev_nextthink, get_gametime() + 2.0 + float(i) * 0.2);
 	}
 }
 
-getOffsetsVelocity(id, Float:lengths, Float:vec[3])
+getOffsetsVelocity(id, Float:lengths, Float:vec[3], Float:rotaion)
 {
 	new Float:xOffsets[3];
 	pev(id, pev_v_angle, xOffsets);
 	xOffsets[0] = 0.0;
-	xOffsets[1] += 90.0;
+	xOffsets[1] += rotaion; // 90.0是向右
 	xOffsets[2] = 0.0;
 	angle_vector(xOffsets, ANGLEVECTOR_FORWARD, xOffsets);
 	xs_vec_mul_scalar(xOffsets, lengths, xOffsets);
@@ -121,7 +133,9 @@ public fw_Think(ent)
 			if( is_user_connected(victim) && ( !is_user_alive(victim) || is_p_protected(victim) ) )
 				continue;
 
+			pev(victim, pev_origin, origin2);
 			temp_distance = get_distance_f(origin1, origin2);
+
 			if( temp_distance < min_distances )
 			{
 				min_distances = temp_distance;
@@ -132,7 +146,7 @@ public fw_Think(ent)
 		if( min_distance_id > FM_NULLENT )
 		{
 			pev(min_distance_id, pev_origin, origin2);
-			get_speed_vector(origin1, origin2, 1000.0, velocity);
+			get_speed_vector(origin1, origin2, 1500.0, velocity);
 			set_pev(ent, pev_velocity, velocity);
 
 			vector_to_angle(velocity, angles);
@@ -179,13 +193,13 @@ public fw_Touch(ent, ptd)
 
 explode_sword_missile(ent)
 {
+	new attacker = pev(ent, pev_owner);
 	new targetname[32];
-	const Float:Damage = 10000.0;
+	new Float:iDamage = basic_damge + (float(get_p_strength(attacker)) * 0.5) + get_totaldmg_of_item(attacker);
 
 	new Float:fOrigin[3];
 	pev(ent, pev_origin, fOrigin);
 
-	new attacker = pev(ent, pev_owner);
 	new victim = FM_NULLENT;
 
 	while( (victim = engfunc(EngFunc_FindEntityInSphere, victim, fOrigin, 125.0) ) != 0 ) {
@@ -196,11 +210,11 @@ explode_sword_missile(ent)
 
 		if( is_user_alive(victim) && !is_p_protected(victim) && get_p_skill(attacker, g_SkillId) > 0 )
 		{
-			dmg_kill_player(victim, attacker, Damage, "sword_missile");
+			dmg_kill_player(victim, attacker, iDamage, "sword_missile");
 		}
 		else if( !is_user_connected(victim) && equal(targetname, "func_wall") )
 		{
-			ExecuteHam(Ham_TakeDamage, victim, ent, attacker, Damage, DMG_BLAST);
+			ExecuteHam(Ham_TakeDamage, victim, ent, attacker, iDamage, DMG_BLAST);
 		}
 	}
 

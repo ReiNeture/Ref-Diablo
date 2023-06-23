@@ -183,6 +183,21 @@ public Set_Player_Vitality_Item(id, item_id)
 		g_Vitality[id][g_CurrentChar[id]] += item_data[item_id][CHAR_GIVEVIT];
 	}
 }
+public Set_Player_Skills_Item(id, item_id)
+{
+	if ( g_iPlayerItemWorn[id][g_CurrentChar[id]][item_id] && g_iPlayerItem[id][g_CurrentChar[id]][item_id] > 0 
+	&& g_PlayerLevel[id][g_CurrentChar[id]] >= item_data[item_id][CHAR_LEVEL] && g_Strength[id][g_CurrentChar[id]] >= item_data[item_id][CHAR_STR] 
+	&& g_Dexterity[id][g_CurrentChar[id]] >= item_data[item_id][CHAR_DEX] && item_data[item_id][CHAR_SKILLSID] > 0 )
+	{
+		for (new skill_id = 0; skill_id <= g_skillcounter; skill_id++)
+		{
+			if ( g_skillhero[skill_id] == item_data[item_id][CHAR_SKILLSID] )
+			{
+				g_iSkills[id][g_CurrentChar[id]][skill_id]++;
+			}
+		}
+	}
+}
 
 public Set_Player_Potion_HP(id, item_id)
 {

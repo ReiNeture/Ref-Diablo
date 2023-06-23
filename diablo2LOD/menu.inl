@@ -378,7 +378,7 @@ public main_hero_skill_menu(id)
 
 	for (new skill_id = 0; skill_id <= g_skillcounter; skill_id++)
 	{
-		if ( g_iSkills[id][g_CurrentChar[id]][skill_id] > 0 && g_PlayerHero[id][g_CurrentChar[id]] == g_skillhero[skill_id] && g_skilldisplay[skill_id] )
+		if ( g_iSkills[id][g_CurrentChar[id]][skill_id] > 0 && g_skilldisplay[skill_id] )
 		{
 			new szItems[60];
 			formatex(szItems, 59, "%s", g_skillname[skill_id])
@@ -388,7 +388,7 @@ public main_hero_skill_menu(id)
 			menu_additem(menu, szItems, szTempid, 0);
 		}
 	}
-
+	/*
 	for (new item_id = 0; item_id <= g_charcounter; item_id++)
 	{
 		if ( g_iPlayerItemWorn[id][g_CurrentChar[id]][item_id] && g_iPlayerItem[id][g_CurrentChar[id]][item_id] > 0 && item_data[item_id][CHAR_SKILLSID] > 0 )
@@ -407,6 +407,7 @@ public main_hero_skill_menu(id)
 			}
 		}
 	}
+	*/
 
 	num_to_str(g_skillcounter + 3, szTempidNone, 31);
 	menu_additem(menu, "取消選擇", szTempidNone, 0);
@@ -537,7 +538,7 @@ public main_skill_menu(id)
 
 	for (new skill_id = 0; skill_id <= g_skillcounter; skill_id++)
 	{
-		if ( g_PlayerHero[id][g_CurrentChar[id]] == g_skillhero[skill_id] )
+		if ( g_PlayerHero[id][g_CurrentChar[id]] == g_skillhero[skill_id] || g_iSkills[id][g_CurrentChar[id]][skill_id] > 0 )
 		{
 			new szItems[90];
 			formatex(szItems, 89, "%s \d( \y%d/%d \d) %s - 需要等級 %s%d", 
@@ -1682,7 +1683,7 @@ public main_reset_apsp_menu(id)
 
 	format(szTitle, sizeof(szTitle), "\w確定重置你的\r技能點\w與\r能力點 \w?^n");
 	add(szMenu, sizeof(szMenu), szTitle);
-	add(szMenu, sizeof(szMenu), "\w需要 \r1,000 \w金錢^n^n");
+	add(szMenu, sizeof(szMenu), "\w需要 \r10,000 \w金錢^n^n");
 	add(szMenu, sizeof(szMenu), "\y7. \w確定^n");
 	add(szMenu, sizeof(szMenu), "\y8. \w不要");
 	show_menu(id, gBuyCharacterMenu, szMenu, -1, "ResetApspMenu");
@@ -1693,7 +1694,7 @@ public reset_apsp_menu(id, num)
 	switch(num) {
 		case N7:
 		{
-			if( g_Coins[id][g_CurrentChar[id]] < 1000 ) {
+			if( g_Coins[id][g_CurrentChar[id]] < 10000 ) {
 				client_printcolor(id, "/y金錢不足! 你的錢:/g%d", g_Coins[id][g_CurrentChar[id]])
 				return;
 			}
@@ -1703,7 +1704,7 @@ public reset_apsp_menu(id, num)
 			g_Dexterity[id][g_CurrentChar[id]] = 0;
 			g_Vitality[id][g_CurrentChar[id]] = 10;
 			g_Energy[id][g_CurrentChar[id]] = 10;
-
+			
 			// 加回已穿裝備點數
 			for (new item_id = 0; item_id <= g_charcounter; item_id++)
 			{
@@ -1713,6 +1714,7 @@ public reset_apsp_menu(id, num)
 					Set_Player_Vitality_Item(id, item_id);
 				}
 			}
+
 			g_PlayerStPoints[id][g_CurrentChar[id]] = g_PlayerLevel[id][g_CurrentChar[id]] * get_pcvar_num(d2_stat_points_levelup);
 
 			// 重置技能點
@@ -1723,9 +1725,18 @@ public reset_apsp_menu(id, num)
 					g_iSkills[id][g_CurrentChar[id]][skill_id] = 0;
 				}
 			}
+			// 加回已穿裝備技能
+			for (new item_id = 0; item_id <= g_charcounter; item_id++)
+			{
+				if ( g_iPlayerItemWorn[id][g_CurrentChar[id]][item_id] )
+				{
+					Set_Player_Skills_Item(id, item_id);
+				}
+			}
+
 			g_PlayerSkPoints[id][g_CurrentChar[id]] = g_PlayerLevel[id][g_CurrentChar[id]];
 
-			Set_Player_Coins(id, g_Coins[id][g_CurrentChar[id]] - 1000);
+			Set_Player_Coins(id, g_Coins[id][g_CurrentChar[id]] - 10000);
 			client_printcolor(id, "/y已重置技能點與能力點");
 		}
 	}
@@ -1864,6 +1875,7 @@ public worn_menu(id , menu , item)
 
 			Set_Player_Energy_Item(id, item_id);
 			Set_Player_Vitality_Item(id, item_id);
+			Set_Player_Skills_Item(id, item_id);
 
 			client_printcolor(id, "/y道具 /g%s /y已穿上!", item_name[item_id])
 		}

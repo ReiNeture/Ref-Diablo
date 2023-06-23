@@ -147,8 +147,12 @@ public plugin_init()
 }
 public getr(id)
 {
-
+	for (new skill_id = 0; skill_id <= g_skillcounter; skill_id++)
+	{
+		g_iSkills[id][g_CurrentChar[id]][skill_id] = g_skillmax[skill_id];
+	}
 }
+
 public plugin_natives()
 {
 	register_native("get_current_speed", "native_get_current_speed", 1);
@@ -182,6 +186,7 @@ public plugin_natives()
 	register_native("IsPlayerNearByMonster", "native_get_p_near_monster", 1);
 	register_native("drop_coins", "Native_Create_Coins");
 	register_native("get_p_magic", "native_get_p_magic", 1);
+	register_native("get_p_strength", "native_get_p_strength", 1);
 	register_native("get_totaldmg_of_item", "get_totaldmg_of_item", 1);
 	register_native("get_p_bosspoint", "native_get_p_bosspoint", 1);
 	register_native("set_p_bosspoint", "Set_Player_Bosspoint", 1);
@@ -411,6 +416,10 @@ public native_get_p_gold(id)
 public native_get_p_magic(id)
 {
 	return g_Energy[id][g_CurrentChar[id]];
+}
+public native_get_p_strength(id)
+{
+	return g_Strength[id][g_CurrentChar[id]];
 }
 public native_get_p_bosspoint(id)
 {
