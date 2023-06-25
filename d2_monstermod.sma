@@ -36,44 +36,44 @@ new const Monster_Models[MAX_MONSTERS][] =
 new const Monster_Xp[MAX_MONSTERS] =
 {
 	1500,		// 異型戰士	
-	60000,		// 大媽	
-	1000,		// 鱷魚	
+	50000,		// 大媽	
+	5000,		// 鱷魚	
 	1200,		// 首腦	
-	0,			// 大藍
-	70,			// 食腦蟲
-	400,		// 百目狗	
+	80000,		// 大藍
+	60,			// 食腦蟲
+	800,		// 百目狗	
 	1200,		// 弗地崗人	
 	0,			// 聖甲蟲
-	2000,		// 殭屍	
+	1000,		// 殭屍	
 	0,			// 人類戰士
-	777777,		// 鷹爪
-	10000,		// 小灰	
+	90000,		// 鷹爪
+	5000,		// 小灰	
 	0,			// 老鼠
-	20000,		// 殭屍王
+	30000,		// 殭屍王
 	50000,      // 阿帕契	
-	40000,		// 變異殭屍王
-	2500		// 可莉殭屍
+	50000,		// 變異殭屍王
+	10000		// 可莉殭屍
 }
 new const Monster_Coins[MAX_MONSTERS] =
 {
-	20,
-	70,
-	10,
-	20,
-	0,
-	3,
-	0,
-	25,
-	0,
-	15,
-	0,
-	100000,
-	500,
-	0,
-	1024,
-	5000,
-	1024,
-	20
+	20,					// 異型戰士	
+	70,					// 大媽	
+	10,					// 鱷魚	
+	20,					// 首腦	
+	0,					// 大藍
+	12,					// 食腦蟲
+	35,					// 百目狗	
+	25,					// 弗地崗人	
+	0,					// 聖甲蟲
+	40,					// 殭屍	
+	0,					// 人類戰士
+	9999,				// 鷹爪
+	500,				// 小灰	
+	0,					// 老鼠
+	4000,				// 殭屍王
+	5000,				// 阿帕契	
+	6000,				// 變異殭屍王
+	200					// 可莉殭屍
 }
 new const Monster_Names[MAX_MONSTERS][] =
 {
@@ -100,33 +100,34 @@ new const Monster_Names[MAX_MONSTERS][] =
 new const Monster_BossPoints[MAX_MONSTERS] =
 {
 	0,			// 異型戰士
-	20000,		// 大媽
-	20,			// 鱷魚
+	200,		// 大媽
+	30,			// 鱷魚
 	0,			// 首腦
-	200,		// 大藍
+	250,		// 大藍
 	0,			// 食腦蟲
 	0,			// 百目狗
 	0,			// 弗地崗人
 	0,			// 聖甲蟲
 	0,			// 殭屍
 	0,			// 人類戰士
-	140,		// 鷹爪
-	0,			// 小灰
+	160,		// 鷹爪
+	50,			// 小灰
 	0,			// 老鼠
-	10,			// 殭屍王
+	40,			// 殭屍王
 	10000,		// 阿帕契
-	300,		// 變異殭屍王
+	70,			// 變異殭屍王
 	0			// 可莉殭屍
 }
 
-#define MAX_DROPS_MONSTERS 5
+#define MAX_DROPS_MONSTERS 6
 new const Drops_Models[MAX_DROPS_MONSTERS][] =
 {
 	"models/headcrab.mdl",
 	"models/houndeye.mdl",
 	"models/zombie.mdl",
 	"models/garg.mdl",
-	"models/tentacle2.mdl"
+	"models/tentacle2.mdl",
+	"models/gonome.mdl"
 }
 
 new const Drops_Id[MAX_DROPS_MONSTERS] =
@@ -135,15 +136,17 @@ new const Drops_Id[MAX_DROPS_MONSTERS] =
 	1,		//	綠色的皮
 	2,		//	A 血液
 	3,		//	藍色核心
-	4		//	鷹爪嘴巴
+	4,		//	鷹爪嘴巴
+	6		// 殭屍王之心
 }
 
 new const Drops_Chance[MAX_DROPS_MONSTERS] =
 {
-	100,
+	50,
+	50,
+	50,
 	20,
-	100,
-	20,
+	10,
 	20
 }
 

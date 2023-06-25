@@ -30,14 +30,14 @@ new const Variety_Name[MAX_MONSTERS][] =
 // 1 = 0.01%, 10 = 0.1%, 100 = 1%, 1000 = 10%, 10000 = 100%
 new const Variety_Chance[MAX_MONSTERS] =
 {
-	1000,
-	5
+	200,
+	10
 };
 
 new const Float:Variety_Health[MAX_MONSTERS] =
 {
-	300000.0,
-	1000.0
+	30000.0,
+	2000.0
 };
 
 public plugin_init() 

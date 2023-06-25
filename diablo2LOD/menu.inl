@@ -1067,7 +1067,7 @@ public charsi_info_menu(id , menu , item)
 	new item_id = str_to_num(data);
 
 	client_printcolor(id, "/y============== /ctr%s /y==============", item_name[item_id]);
-	client_printcolor(id, "/y編號:/g%d/y, 價格:/g%d$", item_id, item_data[item_id][CHAR_COST]);
+	client_printcolor(id, "/y編號:/g%d/y, 種類:/g%s/y, 價格:/g%d$", item_id, Items_Type_Name[item_data[item_id][CHAR_TYPE]], item_data[item_id][CHAR_COST]);
 	client_printcolor(id, "/ctr裝備素質 /y傷害/g+%d/y, 防禦力/g+%d/y, 體力/g+%d/y, 能量/g+%d/y, 爆擊率/g+%d", 
 		item_data[item_id][CHAR_DAMAGE], item_data[item_id][CHAR_ARMOR], item_data[item_id][CHAR_GIVEVIT], 
 		item_data[item_id][CHAR_GIVEENE], item_data[item_id][CHAR_BLOCK]);
@@ -1326,7 +1326,8 @@ public main_make_karambithardened_menu(id)
 	add(szMenu, sizeof(szMenu), "\y- 需要素材^n");
 	add(szMenu, sizeof(szMenu), "\w爪刀 \yx1 ^n");
 	add(szMenu, sizeof(szMenu), "\wA 血液 \yx100 ^n");
-	add(szMenu, sizeof(szMenu), "\w高階催化劑 \yx30 ^n^n");
+	add(szMenu, sizeof(szMenu), "\w殭屍王之心 \yx1 ^n");
+	add(szMenu, sizeof(szMenu), "\w高階催化劑 \yx10 ^n^n");
 
 	add(szMenu, sizeof(szMenu), "\y8. \w製作^n");
 	add(szMenu, sizeof(szMenu), "\y0. \w取消");
@@ -1347,13 +1348,15 @@ public make_karambit_hardened_menu(id, num)
 		const karambit_hardened_id = 12;
 
 		if( g_iPlayerDrops[id][g_CurrentChar[id]][A_BOOLD] >= 100 && 
-			g_iPlayerDrops[id][g_CurrentChar[id]][CATALYST] >= 30 &&
+			g_iPlayerDrops[id][g_CurrentChar[id]][CATALYST] >= 10 &&
+			g_iPlayerDrops[id][g_CurrentChar[id]][GONOME_HEART] >= 1 &&
 			g_iPlayerItem[id][g_CurrentChar[id]][karambit_id] >= 1 ) 
 		{
 			g_iPlayerDrops[id][g_CurrentChar[id]][A_BOOLD] -= 100;
-			g_iPlayerDrops[id][g_CurrentChar[id]][CATALYST] -= 30;
-
+			g_iPlayerDrops[id][g_CurrentChar[id]][CATALYST] -= 10;
+			g_iPlayerDrops[id][g_CurrentChar[id]][GONOME_HEART] -= 1;
 			g_iPlayerItem[id][g_CurrentChar[id]][karambit_id]--;
+
 			if ( g_iPlayerItem[id][g_CurrentChar[id]][karambit_id] < 1 && g_iPlayerItemWorn[id][g_CurrentChar[id]][karambit_id] )
 			{
 				g_iPlayerItemWorn[id][g_CurrentChar[id]][karambit_id] = ITEM_NOT_WORN;
@@ -1382,10 +1385,10 @@ public main_make_karambit_menu(id)
 	add(szMenu, sizeof(szMenu), "\r爪刀 \yx1^n^n");
 
 	add(szMenu, sizeof(szMenu), "\y- 需要素材^n");
-	add(szMenu, sizeof(szMenu), "\w鷹爪嘴巴 \yx1 ^n");
-	add(szMenu, sizeof(szMenu), "\w食腦蟲鱗片 \yx100 ^n");
-	add(szMenu, sizeof(szMenu), "\w綠色的皮 \yx20 ^n");
-	add(szMenu, sizeof(szMenu), "\w高階催化劑 \yx5 ^n^n");
+	add(szMenu, sizeof(szMenu), "\w食腦蟲鱗片 \yx200 ^n");
+	add(szMenu, sizeof(szMenu), "\w綠色的皮 \yx40 ^n");
+	add(szMenu, sizeof(szMenu), "\w高階催化劑 \yx5 ^n");
+	add(szMenu, sizeof(szMenu), "\w金錢 \y50,000 ^n^n");
 
 	add(szMenu, sizeof(szMenu), "\y8. \w製作^n");
 	add(szMenu, sizeof(szMenu), "\y0. \w取消");
@@ -1402,15 +1405,15 @@ public make_karambit_menu(id, num)
 			return PLUGIN_HANDLED;
 		}
 
-		if( g_iPlayerDrops[id][g_CurrentChar[id]][TENTACLE_MOUTH] >= 1 && 
-			g_iPlayerDrops[id][g_CurrentChar[id]][HEADCRAB_SCALES] >= 100 && 
-			g_iPlayerDrops[id][g_CurrentChar[id]][GREEN_LEATHER] >= 20 && 
-			g_iPlayerDrops[id][g_CurrentChar[id]][CATALYST] >= 5 ) 
+		if( g_iPlayerDrops[id][g_CurrentChar[id]][HEADCRAB_SCALES] >= 200 && 
+			g_iPlayerDrops[id][g_CurrentChar[id]][GREEN_LEATHER] >= 40 && 
+			g_iPlayerDrops[id][g_CurrentChar[id]][CATALYST] >= 5 &&
+			g_Coins[id][g_CurrentChar[id]] >= 50000 ) 
 		{
-			g_iPlayerDrops[id][g_CurrentChar[id]][TENTACLE_MOUTH] -= 1;
-			g_iPlayerDrops[id][g_CurrentChar[id]][HEADCRAB_SCALES] -= 100;
-			g_iPlayerDrops[id][g_CurrentChar[id]][GREEN_LEATHER] -= 20;
+			g_iPlayerDrops[id][g_CurrentChar[id]][HEADCRAB_SCALES] -= 200;
+			g_iPlayerDrops[id][g_CurrentChar[id]][GREEN_LEATHER] -= 40;
 			g_iPlayerDrops[id][g_CurrentChar[id]][CATALYST] -= 5;
+			g_Coins[id][g_CurrentChar[id]] -= 50000;
 
 			const item_id = 11;
 			give_player_item(id, item_id)
@@ -1432,9 +1435,6 @@ public main_make_refknife_menu(id)
 	add(szMenu, sizeof(szMenu), "\r參考刀 \yx1^n^n");
 
 	add(szMenu, sizeof(szMenu), "\y- 需要素材^n");
-	add(szMenu, sizeof(szMenu), "\w學妹的內褲 \yx1 ^n");
-	add(szMenu, sizeof(szMenu), "\w高階催化劑 \yx1 ^n");
-	add(szMenu, sizeof(szMenu), "\w學長的內褲 \yx1 ^n");
 	add(szMenu, sizeof(szMenu), "\w金錢 \y100,000 ^n^n");
 
 	add(szMenu, sizeof(szMenu), "\y8. \w製作^n");
@@ -1452,12 +1452,8 @@ public make_refknife_menu(id, num)
 			return PLUGIN_HANDLED;
 		}
 
-		if( g_iPlayerDrops[id][g_CurrentChar[id]][TEMP_ITEM1] >= 1 && g_iPlayerDrops[id][g_CurrentChar[id]][CATALYST] >= 1 && 
-			g_iPlayerDrops[id][g_CurrentChar[id]][TEMP_ITEM2] >= 1 && g_Coins[id][g_CurrentChar[id]] >= 100000 ) 
+		if( g_Coins[id][g_CurrentChar[id]] >= 100000 ) 
 		{
-			g_iPlayerDrops[id][g_CurrentChar[id]][CATALYST]--;
-			g_iPlayerDrops[id][g_CurrentChar[id]][TEMP_ITEM1]--;
-			g_iPlayerDrops[id][g_CurrentChar[id]][TEMP_ITEM2]--;
 			Set_Player_Coins(id, g_Coins[id][g_CurrentChar[id]] - 100000)
 
 			const item_id = 10;

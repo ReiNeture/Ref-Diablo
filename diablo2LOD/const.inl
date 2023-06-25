@@ -74,6 +74,20 @@
 #define TYPE_AMULET 8
 #define TYPE_BOLTS 9
 
+new const Items_Type_Name[10][] = 
+{
+	"手套",
+	"鞋子",
+	"腰帶",
+	"護甲",
+	"帽子",
+	"盾牌",
+	"武器",
+	"戒指",
+	"副武器",
+	"箭失"
+}
+
 #define PRESSED(%0) \
 	(((button & (%0)) == (%0)) && ((oldbuttons & (%0)) != (%0)))
 	
@@ -265,7 +279,7 @@ enum {
 	BLUE_CORE,
 	TENTACLE_MOUTH,
 	CATALYST,
-	TEMP_ITEM1,
+	GONOME_HEART,
 	TEMP_ITEM2
 };
 
@@ -277,22 +291,20 @@ new const Drops_Name[MAX_DROPS][] =
 	"藍色核心",
 	"鷹爪嘴巴",
 	"高階催化劑",
-	"學妹的內褲",
+	"殭屍王之心",
 	"學長的內褲"
 }
 
-#define MAX_BPSHOP_DROPS 3
+#define MAX_BPSHOP_DROPS 2
 
 new const Bpshop_Drops_Id[MAX_BPSHOP_DROPS] = {
 	CATALYST,
-	TEMP_ITEM1,
 	TEMP_ITEM2
 }
 
 new const Bpshop_Drops_Cost[MAX_BPSHOP_DROPS] = {
-	650,
-	950,
-	1750
+	10,
+	150
 }
 
 /*================================================================================
@@ -302,7 +314,7 @@ new const Float:HEROES_REGAIN_MANA[MAX_HEROES] = { 5.0, 5.0, 5.0, 5.0, 5.0, 5.0,
 
 new const HEROES_DEFENCE_DEXTERITY[MAX_HEROES] = { 1, 2, 1, 1, 3, 2, 1 }; // 各職業的1點護甲增加多少防禦力.
 
-new const Float: HEROES_STRENGTH_PERSTAT[MAX_HEROES] = { 0.6, 0.8, 0.5, 0.9, 0.7, 0.6, 0.5 }; // 各職業的1點力量增加多少傷害.
+new const Float: HEROES_STRENGTH_PERSTAT[MAX_HEROES] = { 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5 }; // 各職業的1點力量增加多少傷害.
 new const HEROES_DEXTERITY_PERSTAT[MAX_HEROES] = { 3, 4, 2, 4, 3, 3, 2 }; // 各職業的1點敏捷增加多少迴避率.
 new const HEROES_VITALITY_PERSTAT[MAX_HEROES] = { 2, 2, 2, 2, 2, 2, 2 }; // 各職業的1點體力增加多少血量最大值.
 new const HEROES_ENERGY_PERSTAT[MAX_HEROES] = { 3, 3, 3, 3, 3, 3, 3 }; // 各職業的1點能量增加多少最大能量值.
