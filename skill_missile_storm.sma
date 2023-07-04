@@ -169,7 +169,8 @@ explode_missile_storm(ent)
 		}
 		else if( !is_user_connected(victim) && equal(targetname, "func_wall") )
 		{
-			ExecuteHam(Ham_TakeDamage, victim, ent, attacker, iDamage, DMG_BLAST);
+			cause_monster_damage(victim, ent, attacker, iDamage, DMG_BLAST);
+			// ExecuteHam(Ham_TakeDamage, victim, ent, attacker, iDamage, DMG_BLAST);
 		}
 	}
 

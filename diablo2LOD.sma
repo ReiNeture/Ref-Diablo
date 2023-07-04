@@ -20,6 +20,7 @@
 #include "diablo2LOD/cvars.inl"
 #include "diablo2LOD/messages.inl"
 #include "diablo2LOD/menu.inl"
+#include "diablo2LOD/maker.inl"
 #include "diablo2LOD/motd.inl"
 #include "diablo2LOD/public.inl"
 #include "diablo2LOD/entity.inl"
@@ -105,9 +106,11 @@ public plugin_init()
 	register_menucmd(register_menuid("buy_grasswonder_menu"), gBuyCharacterMenu, "buy_grasswonder_menu");
 	register_menucmd(register_menuid("ResetApspMenu"), gBuyCharacterMenu, "reset_apsp_menu");
 
-	register_menucmd(register_menuid("make_refknife_menu"), gMakeItemMenu, "make_refknife_menu");
 	register_menucmd(register_menuid("make_karambit_menu"), gMakeItemMenu, "make_karambit_menu");
 	register_menucmd(register_menuid("make_karambit_hardened_menu"), gMakeItemMenu, "make_karambit_hardened_menu");
+	register_menucmd(register_menuid("make_deepspace_menu"), gMakeItemMenu, "make_deepspace_menu");
+	register_menucmd(register_menuid("make_refknife_menu"), gMakeItemMenu, "make_refknife_menu");
+	register_menucmd(register_menuid("make_surveyor_menu"), gMakeItemMenu, "make_surveyor_menu");
 	
 	// 其他.
 	g_iMaxPlayers = get_maxplayers();
@@ -135,7 +138,7 @@ public plugin_init()
 	if( Count <= 1 )
 		g_iFakeplayer = -1;
 
-	set_task( 2.0, "AddFakeClient" );
+	// set_task( 2.0, "AddFakeClient" );
 
 	set_task( 1.0, "Spawn_Items");
 	set_task( 1.0, "Spawn_Items_Charsi")
@@ -187,12 +190,13 @@ public plugin_natives()
 	register_native("drop_coins", "Native_Create_Coins");
 	register_native("get_p_magic", "native_get_p_magic", 1);
 	register_native("get_p_strength", "native_get_p_strength", 1);
+	register_native("get_p_dexterity", "native_get_p_dexterity", 1);
 	register_native("get_totaldmg_of_item", "get_totaldmg_of_item", 1);
 	register_native("get_p_bosspoint", "native_get_p_bosspoint", 1);
 	register_native("set_p_bosspoint", "Set_Player_Bosspoint", 1);
 	register_native("set_p_drops", "native_set_p_drops", 1);
 	register_native("get_p_drops", "native_get_p_drops", 1);
-	register_native("get_drops_name", "native_get_drops_name", 0);
+	register_native("cause_monster_damage", "native_cause_monster_damage", 1);
 }
 
 public client_connect(id)
@@ -241,7 +245,7 @@ public client_disconnect(id)
 	if( g_iFakeplayer == id ) 
 	{
 		g_iFakeplayer = 0;
-		set_task( 1.5, "AddFakeClient" );
+		// set_task( 1.5, "AddFakeClient" );
 	}
 
 	// 回覆模組.
@@ -420,6 +424,10 @@ public native_get_p_magic(id)
 public native_get_p_strength(id)
 {
 	return g_Strength[id][g_CurrentChar[id]];
+}
+public native_get_p_dexterity(id)
+{
+	return g_Dexterity[id][g_CurrentChar[id]];
 }
 public native_get_p_bosspoint(id)
 {

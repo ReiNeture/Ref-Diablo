@@ -37,40 +37,40 @@ new const Monster_Xp[MAX_MONSTERS] =
 {
 	1500,		// 異型戰士	
 	50000,		// 大媽	
-	5000,		// 鱷魚	
+	4000,		// 鱷魚	
 	1200,		// 首腦	
 	80000,		// 大藍
 	60,			// 食腦蟲
-	800,		// 百目狗	
+	500,		// 百目狗	
 	1200,		// 弗地崗人	
 	0,			// 聖甲蟲
-	1000,		// 殭屍	
+	700,		// 殭屍	
 	0,			// 人類戰士
 	90000,		// 鷹爪
 	5000,		// 小灰	
 	0,			// 老鼠
-	30000,		// 殭屍王
+	8000,		// 殭屍王
 	50000,      // 阿帕契	
-	50000,		// 變異殭屍王
+	10000,		// 變異殭屍王
 	10000		// 可莉殭屍
 }
 new const Monster_Coins[MAX_MONSTERS] =
 {
 	20,					// 異型戰士	
-	70,					// 大媽	
-	10,					// 鱷魚	
+	8000,				// 大媽	
+	1500,				// 鱷魚	
 	20,					// 首腦	
-	0,					// 大藍
-	12,					// 食腦蟲
-	35,					// 百目狗	
+	15000,				// 大藍
+	15,					// 食腦蟲
+	52,					// 百目狗	
 	25,					// 弗地崗人	
 	0,					// 聖甲蟲
-	40,					// 殭屍	
+	60,					// 殭屍	
 	0,					// 人類戰士
-	9999,				// 鷹爪
-	500,				// 小灰	
+	10000,				// 鷹爪
+	3000,				// 小灰	
 	0,					// 老鼠
-	4000,				// 殭屍王
+	2000,				// 殭屍王
 	5000,				// 阿帕契	
 	6000,				// 變異殭屍王
 	200					// 可莉殭屍
@@ -101,7 +101,7 @@ new const Monster_BossPoints[MAX_MONSTERS] =
 {
 	0,			// 異型戰士
 	200,		// 大媽
-	30,			// 鱷魚
+	20,			// 鱷魚
 	0,			// 首腦
 	250,		// 大藍
 	0,			// 食腦蟲
@@ -119,7 +119,7 @@ new const Monster_BossPoints[MAX_MONSTERS] =
 	0			// 可莉殭屍
 }
 
-#define MAX_DROPS_MONSTERS 6
+#define MAX_DROPS_MONSTERS 8
 new const Drops_Models[MAX_DROPS_MONSTERS][] =
 {
 	"models/headcrab.mdl",
@@ -127,31 +127,40 @@ new const Drops_Models[MAX_DROPS_MONSTERS][] =
 	"models/zombie.mdl",
 	"models/garg.mdl",
 	"models/tentacle2.mdl",
-	"models/gonome.mdl"
+	"models/gonome.mdl",
+	"models/bullsquid.mdl",
+	"models/babygarg.mdl"
 }
 
 new const Drops_Id[MAX_DROPS_MONSTERS] =
 {
 	0,		//	食腦蟲鱗片
-	1,		//	綠色的皮
+	1,		//	百目狗的皮
 	2,		//	A 血液
 	3,		//	藍色核心
 	4,		//	鷹爪嘴巴
-	6		// 殭屍王之心
+	6,		//  殭屍王証明
+	8,		//  鱷魚牙齒
+	9,		//  小灰通行證
 }
 
+// 1 = 0.1%, 10 = 1%, 100 = 10%, 1000 = 100%;
 new const Drops_Chance[MAX_DROPS_MONSTERS] =
 {
+	500,
+	1,
+	1,
 	50,
 	50,
 	50,
-	20,
-	10,
-	20
+	100,
+	50
 }
 
 new g_iMaxPlayers;
+new Float:g_view_time[33];
 new d2_exp_scale;
+
 
 public plugin_init() 
 {
@@ -210,13 +219,14 @@ public Monster_Killed(this, idattacker, shouldgib)
 	{
 		if( equal( MonsterMdl, Drops_Models[monsters] ) && Drops_Id[monsters] > -1 ) 
 		{
-			if( random_num(1, 100) <= Drops_Chance[monsters] )
+			if( random_num(1, 1000) <= Drops_Chance[monsters] )
 			{
 				set_p_drops(idattacker, Drops_Id[monsters], get_p_drops(idattacker, Drops_Id[monsters]) + 1);
-			}
-
-			if( Drops_Chance[monsters] <= 20 )
-			{
+				
+				if( Drops_Chance[monsters] <= 20 )
+				{
+					client_printcolor(idattacker, "/g獲得稀有物品/ctr!");
+				}
 			}
 		}
 	}
@@ -226,13 +236,19 @@ public Monster_Killed(this, idattacker, shouldgib)
 
 public fw_Monster_PreThink(this, idattacker)
 {
-	if(!is_valid_ent(this))
+	if( !is_valid_ent(this) )
 		return HAM_IGNORED
+
+	if( g_view_time[this] > get_gametime() )
+		return HAM_IGNORED
+
+	g_view_time[this] = get_gametime() + 0.2;
 
 	new iTarget, iTemp, szMonsterModel[33], szClassname[33]
 	get_user_aiming(this, iTarget, iTemp)
 	entity_get_string(iTarget, EV_SZ_model, szMonsterModel, sizeof(szMonsterModel))
 	entity_get_string(iTarget, EV_SZ_classname, szClassname, sizeof(szClassname))
+
 	for(new i = 0; i < MAX_MONSTERS; i++)
 	{
 		if(equal(szClassname, "func_wall"))

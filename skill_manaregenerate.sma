@@ -67,7 +67,7 @@ public fwd_PreThink(id)
 		g_LastPressedSkill[id] = get_gametime()
 	}
 
-	if ( is_user_alive(id) && get_p_hero(id) == AMAZON && IsPlayerMoving(id) && get_p_skill( id, g_SkillId ) > 0 )
+	if ( is_user_alive(id) && IsPlayerMoving(id) && get_p_skill( id, g_SkillId ) > 0 )
 	{
 		set_p_mana(id, get_p_mana(id) + ManaRegenerate[ get_p_skill(id, g_SkillId) - 1 ] );
 	}

@@ -230,7 +230,7 @@ public Adv_Message()
 			continue;
 		client_printcolor(id, "/y主要指令: /ctr/d2menu/y, /ctr/worn/y, /ctr/level/y, /ctr/trade/y, /ctr/potion/y, /ctr/spec/y.");
 		client_printcolor(id, "/y倉庫用指令: /ctr/deposit 5/y, /ctr/withdraw 5/y.");
-		client_printcolor(id, "/y控制台指令: /ctrbind t +skills/y, /ctrbind q potion/y.");
+		client_printcolor(id, "/y控制台指令: /ctrbind x +skills/y, /ctrbind q potion/y.");
 		client_printcolor(id, "/y特殊按鈕: /ctrE/y, /ctrMOUSE2/y - 遠距離攻擊/y, /ctrM/y - 打開主選單.");
 	}
 }
@@ -476,4 +476,15 @@ public give_player_item(id, item_id)
 	}
 
 	g_iPlayerItemRepair[id][g_CurrentChar[id]][item_id] = item_data[item_id][CHAR_DURABILITY];
+}
+
+public native_cause_monster_damage(victim, idinflictor, idattacker, Float:damage, damagebits)
+{
+	if ( get_pcvar_num(d2_show_damage) )
+	{
+		set_hudmessage(118, 80, 140, 0.49, 0.3, 1, 1.5, 1.5, 0.0, 0.0, 3)
+		ShowSyncHudMsg(idattacker, g_SyncHudCreate_Dmg , "+%d", floatround(damage));
+	}
+
+	ExecuteHam(Ham_TakeDamage, victim, idinflictor, idattacker, damage, damagebits);
 }

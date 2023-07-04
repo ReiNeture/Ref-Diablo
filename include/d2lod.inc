@@ -177,7 +177,10 @@ native set_p_bosspoint(id, value);
 // 其他物品設定
 native get_p_drops(id, drops_id);
 native set_p_drops(id, drops_id, value);
-native get_drops_name(drops_id, szItems[], maxsize);
+// native get_drops_name(drops_id, szItems[], maxsize);
+
+// 對怪物造成傷害,第一個參數是受害者,第二個參數是加害者,第三個參數是攻擊者,第四個參數是傷害,第五個參數是攻擊類型.
+native cause_monster_damage(victim, idinflictor, idattacker, Float:damage, damagebits);
 
 // 對玩家造成傷害,第一個參數是受害者,第二個參數是攻擊者,第三個參數是傷害,第四個參數是攻擊類型.
 native dmg_kill_player(id, attacker, Float:damage, weaponDescription[])

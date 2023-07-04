@@ -270,41 +270,45 @@ new const Potion_Multi[MAX_POTIONS] = {
 [結束藥水設定.]
 =================================================================================*/
 
-#define MAX_DROPS 8
+#define MAX_DROPS 10
 
 enum { 
-	HEADCRAB_SCALES, 
+	HEADCRAB_SCALES = 0, 
 	GREEN_LEATHER, 
 	A_BOOLD, 
 	BLUE_CORE,
 	TENTACLE_MOUTH,
 	CATALYST,
-	GONOME_HEART,
-	TEMP_ITEM2
+	GONOME_PROVE,
+	PELAGITE,
+	BULLSQUID_TEETH,
+	BABYGARG_PASS
 };
 
 new const Drops_Name[MAX_DROPS][] = 
 {
 	"食腦蟲鱗片",
-	"綠色的皮",
+	"百目狗的皮",
 	"A 血液",
 	"藍色核心",
 	"鷹爪嘴巴",
 	"高階催化劑",
-	"殭屍王之心",
-	"學長的內褲"
+	"殭屍王証明",
+	"深海礦核",
+	"鱷魚牙齒",
+	"小灰通行證"
 }
 
 #define MAX_BPSHOP_DROPS 2
 
 new const Bpshop_Drops_Id[MAX_BPSHOP_DROPS] = {
 	CATALYST,
-	TEMP_ITEM2
+	PELAGITE
 }
 
 new const Bpshop_Drops_Cost[MAX_BPSHOP_DROPS] = {
 	10,
-	150
+	500
 }
 
 /*================================================================================
@@ -312,7 +316,7 @@ new const Bpshop_Drops_Cost[MAX_BPSHOP_DROPS] = {
 =================================================================================*/
 new const Float:HEROES_REGAIN_MANA[MAX_HEROES] = { 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0 }; // 各職業能量的回覆時間(秒)
 
-new const HEROES_DEFENCE_DEXTERITY[MAX_HEROES] = { 1, 2, 1, 1, 3, 2, 1 }; // 各職業的1點護甲增加多少防禦力.
+new const HEROES_DEFENCE_DEXTERITY[MAX_HEROES] = { 2, 2, 2, 2, 2, 2, 2 }; // 各職業的1點護甲增加多少防禦力.
 
 new const Float: HEROES_STRENGTH_PERSTAT[MAX_HEROES] = { 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5 }; // 各職業的1點力量增加多少傷害.
 new const HEROES_DEXTERITY_PERSTAT[MAX_HEROES] = { 3, 4, 2, 4, 3, 3, 2 }; // 各職業的1點敏捷增加多少迴避率.

@@ -18,7 +18,7 @@ new const skills_sound[][] =
 	"ref/moonbreak_hit.wav"
 }
 
-const Float:basic_damge = 1000.0;
+const Float:basic_damge = 3000.0;
 new g_SkillId;
 
 new g_iCurSkill[33];
@@ -53,9 +53,10 @@ public d2_skill_fired(id)
 {
 	if ( g_iCurSkill[id] == g_SkillId )
 	{
-		const Float:cdown = 0.5;
+		const Float:cdown = 5.0;
 		if (get_gametime() - g_LastPressedSkill[id] <= cdown) 
 		{
+			client_print(id, print_center, "技能冷卻中");
 			return PLUGIN_HANDLED;
 		}
 		else if ( get_gametime() - g_LastPressedSkill[id] >= cdown )
@@ -85,16 +86,18 @@ public fw_Think(ent)
 		pev(ent, pev_origin, fOrigin)
 
 		new victim = FM_NULLENT;
-		while( (victim = engfunc(EngFunc_FindEntityInSphere, victim, fOrigin, 500.0) ) != 0 ) {
+		while( (victim = engfunc(EngFunc_FindEntityInSphere, victim, fOrigin, 600.0) ) != 0 ) {
 
 			pev(victim, pev_classname, npcname, sizeof(npcname));
 			if( id != victim && is_user_alive(victim) && !is_p_protected(victim) && get_p_skill(id, g_SkillId) > 0 )
 			{
 				// dmg_kill_player(victim, id, iDamage, "d2_moon_breker");
+				continue;
 			}
 			else if( !is_user_connected(victim) && equal(npcname, "func_wall") )
 			{
-				ExecuteHam(Ham_TakeDamage, victim, ent, id, iDamage, DMG_BURN);
+				cause_monster_damage(victim, ent, id, iDamage, DMG_BLAST);
+				// ExecuteHam(Ham_TakeDamage, victim, ent, id, iDamage, DMG_BURN);
 			}
 			else
 			{

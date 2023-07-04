@@ -20,8 +20,7 @@ const Skill_Req_Level = 33;
 const Skill_Max = 1;
 new g_SkillId;
 
-new count[33];
-const Float:basic_damge = 300.0;
+const Float:basic_damge = 150.0;
 
 public plugin_init() 
 {
@@ -48,11 +47,10 @@ public fw_Weapon_PrimaryAttack(ent)
 	if ( !is_user_connected(id) )
 		return HAM_IGNORED;
 
-	count[id]++;
-	if( get_p_skill( id, g_SkillId ) > 0 && count[id] >= 10 )
+	if( get_p_skill( id, g_SkillId ) > 0 )
 	{
-		count[id] = 0;
-		create_sword_missile(id);
+		if( random_num(1, 14) == 1 )
+			create_sword_missile(id);
 	}
 
 	return HAM_IGNORED;
@@ -60,8 +58,8 @@ public fw_Weapon_PrimaryAttack(ent)
 
 create_sword_missile(id)
 {
-	new Float:origin[3], Float:velocity[3], Float:offorigin[3], Float:angles[3];
-	for( new i = 0; i < 5; i++ )
+	new Float:origin[3], Float:velocity[3], Float:offorigin[3];
+	for( new i = 1; i < 4; i++ )
 	{
 		new sword_missile = engfunc(EngFunc_CreateNamedEntity, engfunc(EngFunc_AllocString, "info_target") )
 		set_pev(sword_missile, pev_classname, "sword_missile");
@@ -73,8 +71,6 @@ create_sword_missile(id)
 
 		engfunc(EngFunc_SetModel, sword_missile, missile_model);
 		engfunc(EngFunc_SetSize, sword_missile, Float:{-2.0, -2.0, -2.0}, Float:{2.0, 2.0, 2.0});
-
-		pev(id, pev_v_angle, angles);
 		set_pev(sword_missile, pev_angles, {90.0, 0.0, 0.0});
 
 		pev(id, pev_origin, origin);
@@ -88,10 +84,10 @@ create_sword_missile(id)
 		}
 		
 		xs_vec_add(origin, velocity, offorigin);
-		offorigin[2] += 64.0;
+		offorigin[2] += 50.0;
 		set_pev(sword_missile, pev_origin, offorigin);
 
-		set_pev(sword_missile, pev_nextthink, get_gametime() + 2.0 + float(i) * 0.2);
+		set_pev(sword_missile, pev_nextthink, get_gametime() + 1.0 + float(i) * 0.2);
 	}
 }
 
@@ -130,7 +126,7 @@ public fw_Think(ent)
 				continue;
 			if( !is_user_connected(victim) && !equal("func_wall", targetname) )
 				continue;
-			if( is_user_connected(victim) && ( !is_user_alive(victim) || is_p_protected(victim) ) )
+			if( is_user_connected(victim) /*&& ( !is_user_alive(victim) || is_p_protected(victim) ) */)
 				continue;
 
 			pev(victim, pev_origin, origin2);
@@ -214,7 +210,8 @@ explode_sword_missile(ent)
 		}
 		else if( !is_user_connected(victim) && equal(targetname, "func_wall") )
 		{
-			ExecuteHam(Ham_TakeDamage, victim, ent, attacker, iDamage, DMG_BLAST);
+			cause_monster_damage(victim, ent, attacker, iDamage, DMG_BLAST);
+			// ExecuteHam(Ham_TakeDamage, victim, ent, attacker, iDamage, DMG_BLAST);
 		}
 	}
 

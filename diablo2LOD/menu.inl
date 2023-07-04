@@ -9,8 +9,10 @@ public main_hero_menu_connect(id)
 	new menu = menu_create(szMsg , "hero_menu_connect");
 	menu_additem(menu, "創造初始角色", "0", 0);
 	if ( g_PlayerChars[id] > 0 )
+	{
 		menu_additem(menu, "選擇角色", "1", 0);
-	menu_additem(menu, "刪除角色", "2", 0);
+		menu_additem(menu, "刪除角色", "2", 0);
+	}
 	
 	menu_setprop(menu , MPROP_EXIT , MEXIT_ALL);
 	menu_display(id , menu , 0); 
@@ -80,10 +82,9 @@ public main_hero_menu(id)
 }
 public hero_menu(id , menu , item) 
 { 
-	if ( !is_user_connected(id) || g_PlayerChars[id] >= 1 )
+	if ( !is_user_connected(id) || g_PlayerChars[id] >= MAX_CHARS )
 	{
-		// client_printcolor( id, "/y你的角色太多了 (/ctr%d/y) !", MAX_CHARS )
-		client_printcolor( id, "/y你已經有初始角色了!")
+		client_printcolor( id, "/y你的角色太多了 (/ctr%d/y) !", MAX_CHARS )
 		main_hero_menu_connect(id)
 		return PLUGIN_HANDLED;
 	}
@@ -1297,7 +1298,10 @@ public main_maker_menu(id)
 	new menu = menu_create("要製作哪一件道具?" , "maker_menu");
 	menu_additem(menu, "爪刀", "1", 0);
 	menu_additem(menu, "表面硬化爪刀", "2", 0);
-	menu_additem(menu, "參考刀", "3", 0);
+	menu_additem(menu, "調查兵團武器", "3", 0);
+	menu_additem(menu, "深海之心", "4", 0);
+	menu_additem(menu, "武爾坎努斯", "5", 0);
+	menu_additem(menu, "參考刀", "6", 0);
 
 	menu_setprop(menu , MPROP_EXIT , MEXIT_ALL);
 	menu_display(id , menu , 0); 
@@ -1313,162 +1317,10 @@ public maker_menu(id , menu , item)
 	switch(key) {
 		case 1: main_make_karambit_menu(id);
 		case 2: main_make_karambithardened_menu(id);
-		case 3: main_make_refknife_menu(id);
+		case 3: main_make_surveyor_menu(id);
+		case 4: main_make_deepspace_menu(id);
+		case 6: main_make_refknife_menu(id);
 	}
-}
-
-public main_make_karambithardened_menu(id)
-{
-	new szMenu[256];
-	add(szMenu, sizeof(szMenu), "\y- 製作^n");
-	add(szMenu, sizeof(szMenu), "\r表面硬化爪刀 \yx1^n^n");
-
-	add(szMenu, sizeof(szMenu), "\y- 需要素材^n");
-	add(szMenu, sizeof(szMenu), "\w爪刀 \yx1 ^n");
-	add(szMenu, sizeof(szMenu), "\wA 血液 \yx100 ^n");
-	add(szMenu, sizeof(szMenu), "\w殭屍王之心 \yx1 ^n");
-	add(szMenu, sizeof(szMenu), "\w高階催化劑 \yx10 ^n^n");
-
-	add(szMenu, sizeof(szMenu), "\y8. \w製作^n");
-	add(szMenu, sizeof(szMenu), "\y0. \w取消");
-	show_menu(id, gBuyCharacterMenu, szMenu, -1, "make_karambit_hardened_menu");
-}
-
-public make_karambit_hardened_menu(id, num) 
-{
-	if( num == N8 )
-	{
-		if (!is_user_connected(id) || Get_Player_Items(id) >= MAX_PLAYER_ITEMS)
-		{
-			client_printcolor(id, "無法製作,道具數量達到最大限制!")
-			return PLUGIN_HANDLED;
-		}
-
-		const karambit_id = 11;
-		const karambit_hardened_id = 12;
-
-		if( g_iPlayerDrops[id][g_CurrentChar[id]][A_BOOLD] >= 100 && 
-			g_iPlayerDrops[id][g_CurrentChar[id]][CATALYST] >= 10 &&
-			g_iPlayerDrops[id][g_CurrentChar[id]][GONOME_HEART] >= 1 &&
-			g_iPlayerItem[id][g_CurrentChar[id]][karambit_id] >= 1 ) 
-		{
-			g_iPlayerDrops[id][g_CurrentChar[id]][A_BOOLD] -= 100;
-			g_iPlayerDrops[id][g_CurrentChar[id]][CATALYST] -= 10;
-			g_iPlayerDrops[id][g_CurrentChar[id]][GONOME_HEART] -= 1;
-			g_iPlayerItem[id][g_CurrentChar[id]][karambit_id]--;
-
-			if ( g_iPlayerItem[id][g_CurrentChar[id]][karambit_id] < 1 && g_iPlayerItemWorn[id][g_CurrentChar[id]][karambit_id] )
-			{
-				g_iPlayerItemWorn[id][g_CurrentChar[id]][karambit_id] = ITEM_NOT_WORN;
-				ExecuteForward( g_iItemTook, g_iReturn, id, karambit_id);
-			}
-
-			give_player_item(id, karambit_hardened_id)
-
-			new names[32];
-			get_user_name(id, names, 31)
-			client_printcolor(0, "/y%s/g製作了 /ctr表面硬化爪刀/y!", names)
-		}
-		else
-		{
-			client_printcolor(id, "/ctr製作/g所需的素材數量不足/y!")
-		}
-	}
-
-	return PLUGIN_CONTINUE;
-}
-
-public main_make_karambit_menu(id)
-{
-	new szMenu[256];
-	add(szMenu, sizeof(szMenu), "\y- 製作^n");
-	add(szMenu, sizeof(szMenu), "\r爪刀 \yx1^n^n");
-
-	add(szMenu, sizeof(szMenu), "\y- 需要素材^n");
-	add(szMenu, sizeof(szMenu), "\w食腦蟲鱗片 \yx200 ^n");
-	add(szMenu, sizeof(szMenu), "\w綠色的皮 \yx40 ^n");
-	add(szMenu, sizeof(szMenu), "\w高階催化劑 \yx5 ^n");
-	add(szMenu, sizeof(szMenu), "\w金錢 \y50,000 ^n^n");
-
-	add(szMenu, sizeof(szMenu), "\y8. \w製作^n");
-	add(szMenu, sizeof(szMenu), "\y0. \w取消");
-	show_menu(id, gBuyCharacterMenu, szMenu, -1, "make_karambit_menu");
-}
-
-public make_karambit_menu(id, num) 
-{
-	if( num == N8 )
-	{
-		if (!is_user_connected(id) || Get_Player_Items(id) >= MAX_PLAYER_ITEMS)
-		{
-			client_printcolor(id, "無法製作,道具數量達到最大限制!")
-			return PLUGIN_HANDLED;
-		}
-
-		if( g_iPlayerDrops[id][g_CurrentChar[id]][HEADCRAB_SCALES] >= 200 && 
-			g_iPlayerDrops[id][g_CurrentChar[id]][GREEN_LEATHER] >= 40 && 
-			g_iPlayerDrops[id][g_CurrentChar[id]][CATALYST] >= 5 &&
-			g_Coins[id][g_CurrentChar[id]] >= 50000 ) 
-		{
-			g_iPlayerDrops[id][g_CurrentChar[id]][HEADCRAB_SCALES] -= 200;
-			g_iPlayerDrops[id][g_CurrentChar[id]][GREEN_LEATHER] -= 40;
-			g_iPlayerDrops[id][g_CurrentChar[id]][CATALYST] -= 5;
-			g_Coins[id][g_CurrentChar[id]] -= 50000;
-
-			const item_id = 11;
-			give_player_item(id, item_id)
-			client_printcolor(id, "/y成功/g製作了 /ctr爪刀/y!")
-		}
-		else
-		{
-			client_printcolor(id, "/ctr製作/g所需的素材數量不足/y!")
-		}
-	}
-
-	return PLUGIN_CONTINUE;
-}
-
-public main_make_refknife_menu(id)
-{
-	new szMenu[256];
-	add(szMenu, sizeof(szMenu), "\y- 製作^n");
-	add(szMenu, sizeof(szMenu), "\r參考刀 \yx1^n^n");
-
-	add(szMenu, sizeof(szMenu), "\y- 需要素材^n");
-	add(szMenu, sizeof(szMenu), "\w金錢 \y100,000 ^n^n");
-
-	add(szMenu, sizeof(szMenu), "\y8. \w製作^n");
-	add(szMenu, sizeof(szMenu), "\y0. \w取消");
-	show_menu(id, gBuyCharacterMenu, szMenu, -1, "make_refknife_menu");
-}
-
-public make_refknife_menu(id, num) 
-{
-	if( num == N8 )
-	{
-		if (!is_user_connected(id) || Get_Player_Items(id) >= MAX_PLAYER_ITEMS)
-		{
-			client_printcolor(id, "無法製作,道具數量達到最大限制!")
-			return PLUGIN_HANDLED;
-		}
-
-		if( g_Coins[id][g_CurrentChar[id]] >= 100000 ) 
-		{
-			Set_Player_Coins(id, g_Coins[id][g_CurrentChar[id]] - 100000)
-
-			const item_id = 10;
-			give_player_item(id, item_id)
-
-			new names[32];
-			get_user_name(id, names, 31)
-			client_printcolor(0, "/y%s /g製作了/ctr參考刀/y!", names)
-		}
-		else
-		{
-			client_printcolor(id, "/ctr製作/g所需的素材數量不足/y!")
-		}
-	}
-	return PLUGIN_CONTINUE;
 }
 
 public main_bpshop_menu(id)
@@ -1585,93 +1437,6 @@ public buychar_menu(id , menu , item)
 	return PLUGIN_HANDLED;
 }
 
-public main_buy_grasswonder_menu(id)
-{
-	new szMenu[256], szItem[64];
-	formatex(szItem, 63, "\w確定購買 \r%s \w?^n", HEROES[NECROMANCER]);
-
-	add(szMenu, sizeof(szMenu), szItem);
-	add(szMenu, sizeof(szMenu), "\w需要 \r2000 \wBossPoint^n^n");
-	add(szMenu, sizeof(szMenu), "\y7. \w確定^n");
-	add(szMenu, sizeof(szMenu), "\y8. \w不要");
-	show_menu(id, gBuyCharacterMenu, szMenu, -1, "buy_grasswonder_menu");
-}
-
-public buy_grasswonder_menu(id, num) 
-{
-	if( num == N7 )
-	{
-		if( g_Bosspoints[id][g_CurrentChar[id]] < 2000 ) {
-			client_printcolor(id, "/g購買條件不足/y!");
-			return;
-		}
-		
-		new Val;
-		g_PlayerChars[id]++;
-		for (new hero_id = 0; hero_id < g_PlayerChars[id]; hero_id++)
-		{
-			if ( !g_PlayerCharActive[id][hero_id] )
-				Val = hero_id;
-		}
-
-		g_PlayerCharActive[id][Val] = CHAR_ACTIVE;
-		g_PlayerHero[id][Val] = NECROMANCER;
-		g_Vitality[id][Val] = 10;
-		g_Energy[id][Val] = 10;
-		
-		g_Bosspoints[id][g_CurrentChar[id]] -= 2000;
-		client_printcolor( id, "/y角色 /g%s /y以創造, 角色數量 : /ctr%d", HEROES[NECROMANCER], g_PlayerChars[id]);
-	}	
-}
-
-public main_buy_chisato_menu(id)
-{
-	new szMenu[256], szItem[64];
-	formatex(szItem, 63, "\w確定購買 \r%s \w?^n", HEROES[ASSASSIN]);
-
-	add(szMenu, sizeof(szMenu), szItem);
-	add(szMenu, sizeof(szMenu), "\w需要 \r100,000 \w金錢^n^n");
-	add(szMenu, sizeof(szMenu), "\y7. \w確定^n");
-	add(szMenu, sizeof(szMenu), "\y8. \w不要");
-	show_menu(id, gBuyCharacterMenu, szMenu, -1, "buy_chisato_menu");
-}
-
-public buy_chisato_menu(id, num) 
-{
-	switch(num) {
-		case N7:
-		{
-			if( g_Coins[id][g_CurrentChar[id]] < 100000 ) {
-				client_printcolor(id, "/g購買條件不足/y!");
-				return;
-			}
-		/*
-			for(new i = 0; i <= MAX_CHARS; ++i) {
-				if( g_PlayerHero[id][i] == ASSASSIN && g_PlayerCharActive[id][i] ) {
-					client_printcolor(id, "/y你已經有這個角色了! 無法再購買")
-					return;
-				}
-			}
-		*/
-			new Val;
-			g_PlayerChars[id]++;
-			for (new hero_id = 0; hero_id < g_PlayerChars[id]; hero_id++)
-			{
-				if ( !g_PlayerCharActive[id][hero_id] )
-					Val = hero_id;
-			}
-
-			g_PlayerCharActive[id][Val] = CHAR_ACTIVE;
-			g_PlayerHero[id][Val] = ASSASSIN;
-			g_Vitality[id][Val] = 10;
-			g_Energy[id][Val] = 10;
-			
-			Set_Player_Coins(id, g_Coins[id][g_CurrentChar[id]] - 100000);
-			client_printcolor( id, "/y角色 /g%s /y以創造, 角色數量 : /ctr%d", HEROES[ASSASSIN], g_PlayerChars[id]);
-		}
-	}
-}
-
 public main_reset_apsp_menu(id)
 {
 	new szMenu[256];
@@ -1687,7 +1452,8 @@ public main_reset_apsp_menu(id)
 
 public reset_apsp_menu(id, num) 
 {
-	switch(num) {
+	switch(num) 
+	{
 		case N7:
 		{
 			if( g_Coins[id][g_CurrentChar[id]] < 10000 ) {

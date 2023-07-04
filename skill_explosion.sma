@@ -17,7 +17,7 @@ new const FireStarExplodeSound[] = "weapons/c4_explode1.wav";
 new const FireStarLaunchSound[] = "ref/airplane2.wav";
 new const firestar_model[] = "models/ref/firemagic.mdl"
 
-#define RADIUS_DAMAGE 6000.0
+#define RADIUS_DAMAGE 3000.0
 new const SorcaManaExplosion[MAX_P_SKILLS] =  // 流星攻擊需要的能量.
 {
 	500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
@@ -25,8 +25,8 @@ new const SorcaManaExplosion[MAX_P_SKILLS] =  // 流星攻擊需要的能量.
 };
 new const Float:ExplosionDamage[MAX_P_SKILLS] =  // 流星攻擊的傷害.
 {
-	7000.0, 8000.0, 9000.0, 10000.0, 11000.0, 11500.0, 12000.0, 12500.0, 13000.0, 13500.0, 
-	15000.0, 15500.0, 16000.0, 17000.0, 20000.0, 23000.0, 26000.0, 29000.0, 32000.0, 36000.0
+	2700.0, 2800.0, 2900.0, 3000.0, 3100.0, 3150.0, 3200.0, 3250.0, 3300.0, 3350.0, 
+	3500.0, 3550.0, 3600.0, 3700.0, 4000.0, 4300.0, 4600.0, 4900.0, 5200.0, 5600.0
 };
 
 new g_SkillId;
@@ -54,9 +54,10 @@ public d2_skill_fired(id)
 {
 	if ( g_iCurSkill[id] == g_SkillId )
 	{
-		const Float:cdown = 1.0;
+		const Float:cdown = 10.0;
 		if ( get_gametime() - g_LastPressedSkill[id] <= cdown ) 
 		{
+			client_print(id, print_center, "技能冷卻中");
 			return PLUGIN_HANDLED;
 		}
 		else if ( get_gametime() - g_LastPressedSkill[id] >= cdown )
@@ -123,7 +124,8 @@ public fw_Think(ent)
 		}
 		else if( !is_user_alive(victim) && equal(npcname, "func_wall") )
 		{
-			ExecuteHam(Ham_TakeDamage, victim, ent, id, fDamage, DMG_BURN)
+			cause_monster_damage(victim, ent, id, fDamage, DMG_BURN);
+			// ExecuteHam(Ham_TakeDamage, victim, ent, id, fDamage, DMG_BURN)
 		}
 
 		if( is_user_alive(victim) ) {

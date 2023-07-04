@@ -19,7 +19,7 @@
 #define VERSION "1.0"
 #define AUTHOR "Sh0oT3R"
 
-#define FIRERATE 0.3
+#define FIRERATE 0.2
 #define WILD_FIRERATE 0.1
 #define HITSD 0.0
 #define RELOADSPEED 4.5
@@ -47,26 +47,28 @@ new g_SkillId, g_SkillId2;
 new g_iCurSkill[33];
 new Float:g_LastPressedSkill[33];
 
-new Skill_Level = 5;
-new Skill_Level_Wild = 55;
+new Skill_Level = 15;
 new Skill_Allocate = 25;
+
+new Skill_Level_Wild = 40;
 new Skill_Allocate_Wild = 20;
+
 new const Float:PlasmaDamage[25] =  // 基礎傷害
 {
-	50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 
-	110.0, 120.0, 130.0, 140.0, 150.0, 160.0, 
-	170.0, 180.0, 190.0, 200.0, 210.0, 220.0, 
-	225.0, 230.0, 235.0, 240.0, 245.0, 250.0, 255.0
+	30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 
+	70.0, 75.0, 80.0, 85.0, 90.0, 95.0, 
+	110.0, 115.0, 120.0, 125.0, 130.0, 135.0, 
+	150.0, 155.0, 160.0, 165.0, 170.0, 175.0, 180.0
 };
 new const BulletMana = 1;
-new const TakeOutMana = 50;
+new const TakeOutMana = 0;
 
-new const WILD_ENABLE_MANA = 30;
+new const WILD_ENABLE_MANA = 50;
 new bool:g_wild_enable[33];
 new const Float:WildUtilTime[MAX_P_SKILLS] = 
 {
-	1.0, 1.3, 1.6, 1.9, 2.2, 2.5, 2.8, 3.1, 3.4, 3.7, 
-	4.0, 4.3, 4.6, 4.9, 5.2, 5.5, 5.8, 6.1, 6.4, 7.0
+	1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 
+	2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 3.0
 };
 
 
@@ -332,8 +334,8 @@ public fw_CmdStart(id, handle, seed)
 			return FMRES_IGNORED
 		}
 
-		if( !g_wild_enable[id] )
-			cs_set_weapon_ammo(iWpnID, --iClip)
+		// if( !g_wild_enable[id] )
+		cs_set_weapon_ammo(iWpnID, --iClip)
 		
 		return FMRES_IGNORED
 	}
@@ -441,18 +443,8 @@ public primary_attack(id)
 	get_user_aiming(id, iTarget, iBody)
 	pev(iTarget, pev_classname, npcname, sizeof(npcname));
 	
-	new iEnt = create_entity("info_target")
-	
-	static Float:flOrigin[3]
-	IVecFVec(iEndOrigin, flOrigin)
-	entity_set_origin(iEnt, flOrigin)
-	remove_entity(iEnt)
-	
 	new Float:iDamage = PlasmaDamage[get_p_skill(id, g_SkillId) - 1];
-	if( g_wild_enable[id] )
-	{
-		iDamage *= 1.2;
-	}
+	iDamage += float(get_p_dexterity(id)) * 0.1;
 	iDamage += get_totaldmg_of_item(id);
 
 	if( is_user_alive(iTarget) && !IsPlayerNearByMonster(iTarget) && !is_p_protected(iTarget) && get_p_skill(id, g_SkillId) > 0 )
@@ -490,7 +482,8 @@ public primary_attack(id)
 	}
 	else if(!is_user_alive(iTarget) && equal(npcname, "func_wall") )
 	{
-		ExecuteHam(Ham_TakeDamage, iTarget, id, id, iDamage, DMG_BLAST);
+		cause_monster_damage(iTarget, id, id, iDamage, DMG_BLAST);
+		// ExecuteHam(Ham_TakeDamage, iTarget, id, id, iDamage, DMG_BLAST);
 		// emit_sound(id, CHAN_WEAPON, snd_hit[random_num(0, sizeof snd_hit - 1)], VOL_NORM, ATTN_NORM, 0, PITCH_NORM)
 	}
 }

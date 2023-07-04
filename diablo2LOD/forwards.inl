@@ -215,7 +215,7 @@ public fwd_TraceAttack(victim, attacker, Float:damage, Float:direction[3], trace
 					
 					if ( item_data[item_id][CHAR_DURABILITY] > 0 )
 					{
-						Set_Player_Item_Repair(attacker, item_id, g_iPlayerItemRepair[attacker][g_CurrentChar[attacker]][item_id] - 1);
+						// Set_Player_Item_Repair(attacker, item_id, g_iPlayerItemRepair[attacker][g_CurrentChar[attacker]][item_id] - 1);
 					}
 				}
 			}
